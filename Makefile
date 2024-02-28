@@ -1,3 +1,6 @@
+composer.phar: tools/install-composer.sh
+	tools/install-composer.sh
+
 build/index.html: src/html/index.html
 	cp src/html/index.html build/
 
