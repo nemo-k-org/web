@@ -16,9 +16,14 @@ build/xterm.js: node_modules/xterm/lib/xterm.js
 build/.htaccess: src/conf/apache.htaccess
 	cp src/conf/apache.htaccess build/.htaccess
 
+.PHONY: build-backend-composer
+composer-install: composer.json composer.phar
+	mkdir -p build/vendor/
+	COMPOSER_VENDOR_DIR=build/vendor/ php composer.phar install
+
 .PHONY: api
-api:
-	cp src/api/api.php build/
+api: composer-install
+	cp src/api/*.php build/
 
 .PHONY: lint-js
 lint-js:

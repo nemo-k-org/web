@@ -1,0 +1,6 @@
+{
+    "require": {
+        "doctrine/dbal": "4.0.0",
+        "doctrine/migrations": "^3.7"
+    }
+}

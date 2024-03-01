@@ -1,5 +1,13 @@
 <?php
+
+require_once("local-settings.php");
+require_once("vendor/autoload.php");
+
+use Doctrine\DBAL\DriverManager;
+
 header("Content-Type: application/json");
+
+$db = DriverManager::getConnection(DB_API);
 
 $response = [
     [ 'REQUEST_METHOD' => $_SERVER['REQUEST_METHOD']],
