@@ -4,6 +4,7 @@ import { ESPLoader, LoaderOptions, FlashOptions, Transport } from 'esptool-js'
 import { Terminal } from 'xterm'
 import CryptoJS from 'crypto-js'
 
+import Tabs from './Tabs'
 import JobSubmitter from './JobSubmitter'
 import * as m from './lib/MQuery'
 import { arrayBufferToString } from './lib/arrayBufferHelper'
@@ -14,6 +15,7 @@ let chip: string = null
 let esploader: ESPLoader
 let term: Terminal
 
+const tabs = new Tabs() // eslint-disable-line no-unused-vars
 const jobSubmitter = new JobSubmitter() // eslint-disable-line no-unused-vars
 
 window.addEventListener('load', () => {

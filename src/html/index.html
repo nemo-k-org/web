@@ -10,58 +10,69 @@
     <body>
         <h1>Nemo-K Flash Tool</h1>
 
-        <h2>Submit Job</h2>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" id="tabButtonSubmit">Submit Job</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="tabButtonFlash">Flash Microcontroller</a>
+            </li>
+        </ul>
 
-        <p>Select sensor type:</p>
-        <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
-        <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
-
-        <form>
-            <div id="sensorParameterAreaNone" class="sensorParameterArea">
-                <p>Please select sensor type.</p>
-            </div>
-
-            <div id="sensorParameterAreaTest" class="sensorParameterArea">
-                <div class="form-group">
-                    <label for="sensorParameterTestSsid">Your WiFi SSID</label>
-                    <input type="text" class="form-control" id="sensorParameterTestSsid" aria-describedby="sensorParameterTestSsidHelp">
-                    <small id="sensorParameterTestSsidHelp" class="form-text text-muted">The network name of your yacht for sensor to connect</small>
+        <div id="tabSubmit" class="tabArea">
+            <p>Select sensor type:</p>
+            <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
+            <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
+    
+            <form>
+                <div id="sensorParameterAreaNone" class="sensorParameterArea">
+                    <p>Please select sensor type.</p>
                 </div>
-                <div class="form-group">
-                    <label for="sensorParameterTestPassword">Your WiFi password</label>
-                    <input type="text" class="form-control" id="sensorParameterTestPassword" aria-describedby="sensorParameterTestPasswordHelp">
-                    <small id="sensorParameterTestPasswordHelp" class="form-text text-muted">The network password of your yacht for sensor to connect</small>
+    
+                <div id="sensorParameterAreaTest" class="sensorParameterArea">
+                    <div class="form-group">
+                        <label for="sensorParameterTestSsid">Your WiFi SSID</label>
+                        <input type="text" class="form-control" id="sensorParameterTestSsid" aria-describedby="sensorParameterTestSsidHelp">
+                        <small id="sensorParameterTestSsidHelp" class="form-text text-muted">The network name of your yacht for sensor to connect</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="sensorParameterTestPassword">Your WiFi password</label>
+                        <input type="text" class="form-control" id="sensorParameterTestPassword" aria-describedby="sensorParameterTestPasswordHelp">
+                        <small id="sensorParameterTestPasswordHelp" class="form-text text-muted">The network password of your yacht for sensor to connect</small>
+                    </div>
                 </div>
-            </div>
+    
+                <button id="submitJob" type="button" class="btn btn-primary">Submit job</button>
+    
+                <div id="submitJobResponse"></div>
+            </form>
+        </div>
 
-            <button id="submitJob" type="button" class="btn btn-primary">Submit job</button>
+        <div id="tabFlash" class="tabArea">
+            <h2>Connect to serial</h2>
 
-            <div id="submitJobResponse"></div>
-        </form>
-
-        <h2>Connect to serial</h2>
-
-        <p>
-            <button id="buttonConnect">Connect</button>
-        </p>
-
-        <h2>Flash file</h2>
-
-        <p>
-            File: <input type="file" id="fileFirmware"/>
-        </p>
-        <p>
-            <button id="buttonFlash">Flash file</button>
-        </p>
-
-        <h2>Disconnect from serial</h2>
-
-        <p>
-            <button id="buttonDisconnect">Disconnect</button>
-        </p>
-
-        <h2>Terminal</h2>
-
-        <div id="terminal"></div>
+            <p>
+                <button id="buttonConnect">Connect</button>
+            </p>
+    
+            <h2>Flash file</h2>
+    
+            <p>
+                File: <input type="file" id="fileFirmware"/>
+            </p>
+            <p>
+                <button id="buttonFlash">Flash file</button>
+            </p>
+    
+            <h2>Disconnect from serial</h2>
+    
+            <p>
+                <button id="buttonDisconnect">Disconnect</button>
+            </p>
+    
+            <h2>Terminal</h2>
+    
+            <div id="terminal"></div>
+        </div>
     </body>
 </html>
