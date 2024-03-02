@@ -60,4 +60,4 @@ Dry-run migrations
 
 Deploy migrations:
 
-`$ ./vendor/bin/doctrine-migrations migrate --run`
+`$ ./vendor/bin/doctrine-migrations migrate`
