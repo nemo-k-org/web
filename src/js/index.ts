@@ -1,7 +1,10 @@
+import 'bootstrap/dist/css/bootstrap.min.css'
+
 import { ESPLoader, LoaderOptions, FlashOptions, Transport } from 'esptool-js'
 import { Terminal } from 'xterm'
 import CryptoJS from 'crypto-js'
 
+import JobSubmitter from './JobSubmitter'
 import * as m from './lib/MQuery'
 import { arrayBufferToString } from './lib/arrayBufferHelper'
 
@@ -10,6 +13,8 @@ let transport: Transport
 let chip: string = null
 let esploader: ESPLoader
 let term: Terminal
+
+const jobSubmitter = new JobSubmitter() // eslint-disable-line no-unused-vars
 
 window.addEventListener('load', () => {
   const elTerminal = document.getElementById('terminal')

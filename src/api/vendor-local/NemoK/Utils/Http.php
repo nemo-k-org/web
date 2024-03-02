@@ -7,14 +7,9 @@ class Http {
     const STATUS_CODE_ERROR = 540;
     const STATUS_CODE_ERROR_MISSING_PARAMETERS = 550;
 
-    function postDecodeJson($post) {
-        $decoded = [];
-
-        foreach ($post as $thisKey => $thisValue) {
-            $decoded[$thisKey] = json_decode($thisValue, true);
-        }
-
-        return $decoded;
+    function getInputParameters() {
+        $requestBody = file_get_contents('php://input');
+        return json_decode($requestBody, true);
     }
 }
 ?>

@@ -7,6 +7,9 @@ phpab.phar: tools/install-phpab.sh
 build/index.html: src/html/index.html
 	cp src/html/index.html build/
 
+build/index.css: src/html/index.css
+	cp src/html/index.css build/
+
 build/bundle.js: src/js/*
 	npx webpack --config webpack.js
 
@@ -41,7 +44,7 @@ lint-js:
 	npx eslint "src/js/**"
 
 .PHONY: build
-build: lint-js build/bundle.js build/index.html build/xterm.css build/xterm.js build/.htaccess api
+build: lint-js build/bundle.js build/index.html build/index.css build/xterm.css build/xterm.js build/.htaccess api
 
 .PHONY: start
 start:

@@ -14,8 +14,8 @@ $logger = new Logger("API");
 $logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
 
 $http = new Utils\Http();
-$post = $http->postDecodeJson($_POST);
-$logger->debug('Post variables', [$post, $post['jobParameters']]);
+$post = $http->getInputParameters();
+$logger->debug('Post variables', [$post]);
 
 $router = new Utils\Router();
 $router->add('post', '/api/jobs', $post['jobParameters'], function($routeMatch, $jobParameters) {
@@ -30,13 +30,7 @@ $uri = strtolower($_SERVER['REQUEST_URI']);
 
 $logger->debug('Response object and status', [$response, $statusCode]);
 
-if (is_array($response)) {
-    print(json_encode($response));
-}
-else {
-    print($response);
-}
-
+print(json_encode($response));
 http_response_code($statusCode);
 
 ?>
