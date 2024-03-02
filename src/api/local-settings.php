@@ -29,4 +29,11 @@ else {
     define('LOG_FILE', sys_get_temp_dir().'/nemok.log');
 }
 
+if (getenv('NEMOK_FIRMWARE_PATH')) {
+    define('FIRMWARE_PATH', getenv('NEMOK_FIRMWARE_PATH'));
+}
+else {
+    define('FIRMWARE_PATH', sys_get_temp_dir().'/nemok-firmwares');
+}
+
 ?>

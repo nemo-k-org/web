@@ -8,6 +8,13 @@ This repository contains Nemo-K web interface. Currently it is a proof-of-concep
 utilising [esptool-js](https://www.npmjs.com/package/esptool-js) to upload
 `firmware.bin` which can be created using [the Box](https://github.com/nemo-k-org/the-box).
 
+## Requirements (development)
+
+* PHP 8.1 (`apt install php8.1-cli php8.1-mysql php8.1-zip`)
+* MariaDB (`apt install mariadb-server-10.6`)
+* Apache 2 (`apt install apache2-bin`)
+* NodeJS & npm
+
 ## Building and running
 
 ```
@@ -15,13 +22,7 @@ git clone git@github.com:nemo-k-org/web.git
 cd web
 npm install
 make build
-```
-
-Start your favourite [one-line web server](https://gist.github.com/willurd/5720255)
-to serve files at `build/`
-
-```
-cd build/ && python3 -m http.server 8080
+make start
 ```
 
 ## Database
@@ -61,3 +62,17 @@ Dry-run migrations
 Deploy migrations:
 
 `$ ./vendor/bin/doctrine-migrations migrate`
+
+## API
+
+### POST `/api/jobs`
+
+Submit a new firmware compilation job.
+
+`curl -X POST -d '{"jobParameters":{"ssid":"foo","password":"bar"}}' http://localhost:8080/api/jobs`
+
+### POST `/api/jobs/[jobId]/firmware`
+
+Submit/update a new firmware binary for the job `jobId`.
+
+`curl -X POST -F "firmware=@firmware.zip" http://localhost:8080/api/jobs/[jobId]/firmware`

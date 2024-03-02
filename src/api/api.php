@@ -18,9 +18,15 @@ $post = $http->getInputParameters();
 $logger->debug('Post variables', [$post]);
 
 $router = new Utils\Router();
-$router->add('post', '/api/jobs', $post['jobParameters'], function($routeMatch, $jobParameters) {
+
+$router->add('post', '/api/jobs$', @$post['jobParameters'], function($routeMatch, $jobParameters) {
     $jobs = new Jobs();
     return $jobs->add($jobParameters, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
+});
+
+$router->add('post', '/api/jobs/([\w\d\-]+?)/firmware$', null, function($routeMatch) {
+    $jobs = new Jobs();
+    return $jobs->updateFirmware($routeMatch[1], @$_FILES['firmware']['tmp_name']);
 });
 
 $method = strtolower($_SERVER['REQUEST_METHOD']);
