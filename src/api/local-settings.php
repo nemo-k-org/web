@@ -20,5 +20,13 @@ define('DB_ADMIN', [
     'charset' => 'utf8',
 ]);
 
+define('LOG_LEVEL', \Monolog\Logger::DEBUG);
+
+if (getenv('NEMOK_LOG_FILE')) {
+    define('LOG_FILE', getenv('NEMOK_LOG_FILE'));
+}
+else {
+    define('LOG_FILE', sys_get_temp_dir().'/nemok.log');
+}
 
 ?>

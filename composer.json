@@ -1,6 +1,7 @@
 {
     "require": {
         "doctrine/dbal": "4.0.0",
-        "doctrine/migrations": "^3.7"
+        "doctrine/migrations": "^3.7",
+        "monolog/monolog": "^3.5"
     }
 }
