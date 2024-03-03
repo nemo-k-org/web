@@ -19,7 +19,7 @@ final class Version20240228191021 extends AbstractMigration
         $this->addSql("
             CREATE TABLE `status` (
                 `jobId` CHAR(36) NOT NULL COMMENT 'Refers to table \'jobs\'' ,
-                `jobStatus` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Job status code' ,
+                `jobStatus` VARCHAR(10) NOT NULL DEFAULT 0 COMMENT 'Job status' ,
                 `updated` TIMESTAMP NOT NULL COMMENT 'Updated' 
             ) ENGINE = InnoDB COMMENT = 'Job statuses, appended on progress, last one for the given jobId is the valid status';
         ");
