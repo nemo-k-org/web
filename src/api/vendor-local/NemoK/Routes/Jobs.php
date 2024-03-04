@@ -49,7 +49,6 @@ class Jobs {
         }
 
         $this->jobStatus->add($jobId, 'created');
-
         
         if (!$this->submitJobToCI($jobId)) {
             $this->logger->error("Could not submit job to CI", [$jobId]);
@@ -68,6 +67,8 @@ class Jobs {
             return false;
         }
 
+        $jobData['NEMOK_UPLOAD_URL'] = $this->getFirmwareUploadURL($jobId);
+
         $this->logger->debug('submitting job to CI', [$jobId, $jobData]);
 
         $codeBuild = new Utils\AWS\CodeBuild(AWS_CODEBUILD);
@@ -82,6 +83,10 @@ class Jobs {
         $this->logger->debug('Codebuild job submitted');
 
         return true;
+    }
+
+    private function getFirmwareUploadURL($jobId) {
+        return ROOT_URL.'/api/jobs/'.$jobId.'/firmware';
     }
 
     function updateFirmware($jobId, $firmwareTempFilename) {

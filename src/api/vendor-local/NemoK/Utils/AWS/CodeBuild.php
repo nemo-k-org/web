@@ -3,6 +3,7 @@
 namespace Nemok\Utils\AWS;
 
 use Aws\CodeBuild\CodeBuildClient;
+use Aws\Credentials\CredentialProvider;
 
 class CodeBuild {
     private $aws_settings;
@@ -10,6 +11,7 @@ class CodeBuild {
 
     function __construct($aws_settings) {
         $this->aws_settings = $aws_settings;
+
         $this->aws_client = new CodeBuildClient([
             'profile' => $this->aws_settings['profile'],
             'region' => $this->aws_settings['region'],
@@ -20,7 +22,7 @@ class CodeBuild {
     function submitBuild($jobId, $jobParameters) {
         $jobParameters['jobId'] = $jobId;
 
-        $jobParametersAWS = $this->jobParametersToAWSFormat($jobParametersWithJobId);
+        $jobParametersAWS = $this->jobParametersToAWSFormat($jobParameters);
 
         $response = $this->aws_client->startBuild([
             'projectName' => $this->aws_settings['codeBuildProjectname'],

@@ -43,4 +43,11 @@ else {
     define('FIRMWARE_PATH', sys_get_temp_dir().'/nemok-firmwares');
 }
 
+if (getenv('NEMOK_ROOT_URL')) {
+    define('ROOT_URL', getenv('NEMOK_ROOT_URL'));
+}
+else {
+    define('ROOT_URL',@$_SERVER['REQUEST_SCHEME'].'://'.@$_SERVER['HTTP_HOST']);
+}
+
 ?>
