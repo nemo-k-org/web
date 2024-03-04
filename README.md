@@ -63,6 +63,15 @@ Deploy migrations:
 
 `$ ./vendor/bin/doctrine-migrations migrate`
 
+## CI (AWS CodeBuild)
+
+The current version submits jobs AWS CodeBuild where the firmware is built with Nemo-K
+the-box.
+
+To submit jobs you need to give proper AWS credentials to your local profile
+`NemoK`. If this profile name is used no changes to `src/api/local-settings.php`
+are needed.
+
 ## API
 
 ### POST `/api/jobs`

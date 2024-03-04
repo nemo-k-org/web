@@ -6,15 +6,18 @@ use Doctrine\DBAL\DriverManager;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
-use Utils\StatusCodes;
-
 class Jobs {
     private $dbal;
+    private $jobStatus;
+    private $jobs;
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);
         $this->logger = $logger = new Logger("Jobs");
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
+
+        $this->jobStatus = new Data\JobStatus();
+        $this->jobs = new Data\Jobs();
     }
 
     function add($jobParameters, $userAgent, $remoteAddress) {
@@ -45,7 +48,40 @@ class Jobs {
             return [null, Utils\Http::STATUS_CODE_ERROR];
         }
 
+        $this->jobStatus->add($jobId, 'created');
+
+        
+        if (!$this->submitJobToCI($jobId)) {
+            $this->logger->error("Could not submit job to CI", [$jobId]);
+            return [null, Utils\Http::STATUS_CODE_ERROR];
+        }
+
+        $this->jobStatus->add($jobId, 'submitted');
+
         return [$jobId, Utils\Http::STATUS_CODE_OK];
+    }
+
+    private function submitJobToCI($jobId) {
+        $jobData = $this->jobs->getJob($jobId);
+
+        if (is_null($jobData)) {
+            return false;
+        }
+
+        $this->logger->debug('submitting job to CI', [$jobId, $jobData]);
+
+        $codeBuild = new Utils\AWS\CodeBuild(AWS_CODEBUILD);
+
+        try {
+            $response = $codeBuild->submitBuild($jobId, $jobData['parameters']);
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to submit CodeBuild job', [$e]);
+            return false;
+        }
+
+        $this->logger->debug('Codebuild job submitted');
+
+        return true;
     }
 
     function updateFirmware($jobId, $firmwareTempFilename) {
@@ -79,6 +115,8 @@ class Jobs {
             unlink($firmwareTempFilename);
             return [$jobId, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
         }
+
+        $this->jobStatus->add($jobId, 'submitted');
 
         return [$jobId, Utils\Http::STATUS_CODE_OK];
     }

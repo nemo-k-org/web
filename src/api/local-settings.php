@@ -20,7 +20,14 @@ define('DB_ADMIN', [
     'charset' => 'utf8',
 ]);
 
-define('LOG_LEVEL', \Monolog\Logger::DEBUG);
+define('AWS_CODEBUILD', [
+    'profile' => 'NemoK',
+    'version' => '2016-10-06',
+    'region' => 'eu-central-1',
+    'codeBuildProjectname' => 'Nemo-K-firmware',
+]);
+
+  define('LOG_LEVEL', \Monolog\Logger::DEBUG);
 
 if (getenv('NEMOK_LOG_FILE')) {
     define('LOG_FILE', getenv('NEMOK_LOG_FILE'));
