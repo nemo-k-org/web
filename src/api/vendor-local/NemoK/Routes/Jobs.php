@@ -67,14 +67,15 @@ class Jobs {
             return false;
         }
 
-        $jobData['NEMOK_UPLOAD_URL'] = $this->getFirmwareUploadURL($jobId);
+        $jobParameters = $jobData['parameters'];
+        $jobParameters['NEMOK_UPLOAD_URL'] = $this->getFirmwareUploadURL($jobId);
 
-        $this->logger->debug('submitting job to CI', [$jobId, $jobData]);
+        $this->logger->debug('submitting job to CI', [$jobId, $jobParameters]);
 
         $codeBuild = new Utils\AWS\CodeBuild(AWS_CODEBUILD);
 
         try {
-            $response = $codeBuild->submitBuild($jobId, $jobData['parameters']);
+            $response = $codeBuild->submitBuild($jobId, $jobParameters);
         } catch (\Exception $e) {
             $this->logger->error('Failed to submit CodeBuild job', [$e]);
             return false;

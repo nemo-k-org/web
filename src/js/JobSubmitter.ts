@@ -3,8 +3,9 @@ import axios from 'axios'
 import * as m from './lib/MQuery'
 
 interface SensorParametersTest {
-  ssid: string;
-  password: string;
+  nemok_sensor_test_http: number,
+  nemok_wifi_ssid: string;
+  nemok_wifi_pass: string;
 }
 
 class JobSubmitter {
@@ -50,8 +51,9 @@ class JobSubmitter {
   getSensorParameters = (): SensorParametersTest|null => {
     if (this.selectedSensor === 'test') {
       return {
-        ssid: m.GetFormInputValue('#sensorParameterTestSsid'),
-        password: m.GetFormInputValue('#sensorParameterTestPassword')
+        nemok_sensor_test_http: 1,
+        nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterTestSsid'),
+        nemok_wifi_pass: m.GetFormInputValue('#sensorParameterTestPassword')
       }
     }
 
@@ -69,7 +71,15 @@ class JobSubmitter {
       m.SetText('#submitJobResponse', `Job submitted, id: ${response.data}`)
     } catch (error) {
       console.error(error)
-      m.SetText('#submitJobResponse', 'Failed to submit log. See browser console for details.')
+      if (error.response.status === 550) {
+        if (error.response.data !== null && error.response.data !== '') {
+          m.SetText('#submitJobResponse', `Failed to submit job: ${error.response.data}`)
+        } else {
+          m.SetText('#submitJobResponse', 'Failed to submit job. Check job parameters. You may find more information in the browser console.')
+        }
+      } else {
+        m.SetText('#submitJobResponse', 'Failed to submit job. See browser console for details.')
+      }
     }
   }
 }

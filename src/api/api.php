@@ -15,11 +15,22 @@ $logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
 
 $http = new Utils\Http();
 $post = $http->getInputParameters();
+
 $logger->debug('Post variables', [$post]);
+
+$inputValidator = new Utils\InputValidator(@$post['jobParameters']);
+
+try {
+    $jobParameters = $inputValidator->getValidatedJobParameters();
+} catch (\Exception $e) {
+    print(json_encode($e->getMessage()));
+    http_response_code($http::STATUS_CODE_ERROR_MISSING_PARAMETERS);
+    exit(0);
+}
 
 $router = new Utils\Router();
 
-$router->add('post', '/api/jobs$', @$post['jobParameters'], function($routeMatch, $jobParameters) {
+$router->add('post', '/api/jobs$', $jobParameters, function($routeMatch, $jobParameters) {
     $jobs = new Jobs();
     return $jobs->add($jobParameters, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
 });

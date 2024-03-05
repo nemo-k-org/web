@@ -20,8 +20,6 @@ class CodeBuild {
     }
 
     function submitBuild($jobId, $jobParameters) {
-        $jobParameters['jobId'] = $jobId;
-
         $jobParametersAWS = $this->jobParametersToAWSFormat($jobParameters);
 
         $response = $this->aws_client->startBuild([
