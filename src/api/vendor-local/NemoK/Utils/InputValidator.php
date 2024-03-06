@@ -35,7 +35,20 @@ class InputValidator {
                 throw new \Exception('given value is not alphanumeric');
             }
             else {
-                throw new \Exception('given value "'.$field.'" not alphanumeric');
+                throw new \Exception('given value "'.$field.'" is not alphanumeric');
+            }
+        }
+
+        return $str;
+    }
+
+    function validateUuid($str, $field=null) {
+        if (preg_match('/[^\-0-9a-fA-F]/', $str)) {
+            if (is_null($field)) {
+                throw new \Exception('given value is not UUID');
+            }
+            else {
+                throw new \Exception('given value "'.$field.'" is not UUID');
             }
         }
 

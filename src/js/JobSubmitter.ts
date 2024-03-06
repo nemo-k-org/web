@@ -65,7 +65,8 @@ class JobSubmitter {
 
     try {
       const response = await axios.post('/api/jobs', {
-        jobParameters: jobParameters
+        jobParameters: jobParameters,
+        customerCode: m.GetFormInputValue('#customerCode')
       })
 
       m.SetText('#submitJobResponse', `Job submitted, id: ${response.data}`)

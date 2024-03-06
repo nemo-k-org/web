@@ -39,6 +39,7 @@ GRANT SELECT ON nemok.* TO 'nemok_api'@'localhost' IDENTIFIED BY 'nemok_api_pass
 GRANT INSERT ON nemok.jobs to 'nemok_api'@'localhost';
 GRANT INSERT ON nemok.status to 'nemok_api'@'localhost';
 GRANT INSERT ON nemok.userAgents to 'nemok_api'@'localhost';
+GRANT UPDATE ON nemok.customers to 'nemok_api'@'localhost';
 ```
 
 ### Create new migrations
@@ -71,6 +72,15 @@ the-box.
 To submit jobs you need to give proper AWS credentials to your local profile
 `NemoK`. If this profile name is used no changes to `src/api/local-settings.php`
 are needed.
+
+## Customers
+
+Customers can be added directly to the database:
+
+`INSERT INTO `customers` SET `customerCode`=UUID(), `email`='user@email', `added`=NOW();`
+
+* Currently email is recorded only for the reference
+* Starting a new job requires an existing Customer Code so this should be given to the customer
 
 ## API
 

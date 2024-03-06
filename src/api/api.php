@@ -18,10 +18,18 @@ $post = $http->getInputParameters();
 
 $logger->debug('Post variables', [$post]);
 
-$inputValidator = new Utils\InputValidator(@$post['jobParameters']);
+$inputValidator = new Utils\InputValidator();
+$customerCode = null;
+if (@$post['customerCode']) {
+    try {
+        $customerCode = $inputValidator->validateUuid($post['customerCode']);
+    } catch (\Exception $e) {
+        $logger->debug("Given customerCode is not valid UUID", [$post['customerCode']]);
+    }
+}
 
 try {
-    $jobParameters = $inputValidator->getValidatedJobParameters();
+    $jobParameters = $inputValidator->getValidatedJobParameters(@$post['jobParameters']);
 } catch (\Exception $e) {
     print(json_encode($e->getMessage()));
     http_response_code($http::STATUS_CODE_ERROR_MISSING_PARAMETERS);
@@ -30,7 +38,7 @@ try {
 
 $router = new Utils\Router();
 
-$router->add('post', '/api/jobs$', $jobParameters, function($routeMatch, $jobParameters) {
+$router->addAuthorised('post', '/api/jobs$', $jobParameters, function($routeMatch, $jobParameters) {
     $jobs = new Jobs();
     return $jobs->add($jobParameters, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
 });
@@ -43,7 +51,7 @@ $router->add('post', '/api/jobs/([\w\d\-]+?)/firmware$', null, function($routeMa
 $method = strtolower($_SERVER['REQUEST_METHOD']);
 $uri = strtolower($_SERVER['REQUEST_URI']);
 
-[$response, $statusCode] = $router->route($method, $uri);
+[$response, $statusCode] = $router->route($method, $uri, $customerCode);
 
 $logger->debug('Response object and status', [$response, $statusCode]);
 
