@@ -20,7 +20,7 @@ class Jobs {
         $this->jobs = new Data\Jobs();
     }
 
-    function add($jobParameters, $userAgent, $remoteAddress) {
+    function add($customerId, $jobParameters, $userAgent, $remoteAddress) {
         $uuidGenerator = new Utils\Uuid();
         $jobId = $uuidGenerator->getUuidV4();
 
@@ -35,12 +35,13 @@ class Jobs {
         $userAgentId = $userAgents->getUserAgentId($userAgent);
 
         try {
-            $sql = 'INSERT INTO `jobs` SET `jobId`=?, `parameters`=?, `userAgentId`=?, `ip`=?';
+            $sql = 'INSERT INTO `jobs` SET `jobId`=?, `parameters`=?, `customerId`=?, `userAgentId`=?, `ip`=?';
             $stmt = $this->dbal->prepare($sql);
             $stmt->bindValue(1, $jobId);
             $stmt->bindValue(2, json_encode($jobParameters));
-            $stmt->bindValue(3, $userAgentId);
-            $stmt->bindValue(4, $remoteAddress);
+            $stmt->bindValue(3, $customerId);
+            $stmt->bindValue(4, $userAgentId);
+            $stmt->bindValue(5, $remoteAddress);
     
             $stmt->executeQuery();
         } catch (\Exception $e) {

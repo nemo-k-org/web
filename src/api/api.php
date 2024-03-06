@@ -38,9 +38,9 @@ try {
 
 $router = new Utils\Router();
 
-$router->addAuthorised('post', '/api/jobs$', $jobParameters, function($routeMatch, $jobParameters) {
+$router->addAuthorised('post', '/api/jobs$', $jobParameters, function($routeMatch, $customerId, $jobParameters) {
     $jobs = new Jobs();
-    return $jobs->add($jobParameters, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
+    return $jobs->add($customerId, $jobParameters, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
 });
 
 $router->add('post', '/api/jobs/([\w\d\-]+?)/firmware$', null, function($routeMatch) {

@@ -16,7 +16,7 @@ class Router {
                 'route'=>"#$routeRegexp#",
                 'parameter'=>$parameter,
                 'action'=>$action,
-                'requireCustomer'=>false
+                'requireAuthorisation'=>false
             ]
         );
     }
@@ -28,7 +28,7 @@ class Router {
                 'route'=>"#$routeRegexp#",
                 'parameter'=>$parameter,
                 'action'=>$action,
-                'requireCustomer'=>true
+                'requireAuthorisation'=>true
             ]
         );
     }
@@ -47,23 +47,41 @@ class Router {
             $matchRoute = preg_match($route['route'], $uri, $routeParams);
 
             if ($matchMethod and $matchRoute === 1) {
-                if ($route['requireCustomer'] and is_null($customerId)) {
+                if ($route['requireAuthorisation'] and is_null($customerId)) {
                     continue;
                 }
                 else {
                     $customers->updateLastAction($customerId);
                 }
 
-                if (is_null($route['parameter'])) {
-                    $result = $route['action']($routeParams);
-                }
-                else {
-                    $result = $route['action']($routeParams, $route['parameter']);
-                }
+                $result = $this->callRoute($route, $routeParams, $customerId);
+
+                break;
             }
         }
 
         return $result;
+    }
+
+    private function callRoute($route, $routeParams, $customerId) {
+        if ($route['requireAuthorisation']) {
+            if (is_null($route['parameter'])) {
+                return $route['action']($routeParams, $customerId);
+            }
+            else {
+                return $route['action']($routeParams, $customerId, $route['parameter']);
+            }
+        }
+        else {
+            if (is_null($route['parameter'])) {
+                return $route['action']($routeParams);
+            }
+            else {
+                return $route['action']($routeParams, $route['parameter']);
+            }
+        }
+
+        return null;
     }
 }
 
