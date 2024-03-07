@@ -47,11 +47,13 @@ class Router {
             $matchRoute = preg_match($route['route'], $uri, $routeParams);
 
             if ($matchMethod and $matchRoute === 1) {
-                if ($route['requireAuthorisation'] and is_null($customerId)) {
-                    continue;
-                }
-                else {
-                    $customers->updateLastAction($customerId);
+                if ($route['requireAuthorisation']) {
+                    if (is_null($customerId)) {
+                        continue;
+                    }
+                    else {
+                        $customers->updateLastAction($customerId);
+                    }
                 }
 
                 $result = $this->callRoute($route, $routeParams, $customerId);
