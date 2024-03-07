@@ -34,18 +34,7 @@ class Jobs {
         $userAgents = new \NemoK\Utils\UserAgents();
         $userAgentId = $userAgents->getUserAgentId($userAgent);
 
-        try {
-            $sql = 'INSERT INTO `jobs` SET `jobId`=?, `parameters`=?, `customerId`=?, `userAgentId`=?, `ip`=?';
-            $stmt = $this->dbal->prepare($sql);
-            $stmt->bindValue(1, $jobId);
-            $stmt->bindValue(2, json_encode($jobParameters));
-            $stmt->bindValue(3, $customerId);
-            $stmt->bindValue(4, $userAgentId);
-            $stmt->bindValue(5, $remoteAddress);
-    
-            $stmt->executeQuery();
-        } catch (\Exception $e) {
-            $this->logger->error("Database error", [$sql, $e]);
+        if (!$this->jobs->add($jobId, $parameters, $customerId, $userAgentId, $remoteAddress)) {
             return [null, Utils\Http::STATUS_CODE_ERROR];
         }
 
@@ -62,7 +51,7 @@ class Jobs {
     }
 
     private function submitJobToCI($jobId) {
-        $jobData = $this->jobs->getJob($jobId);
+        $jobData = $this->jobs->get($jobId);
 
         if (is_null($jobData)) {
             return false;

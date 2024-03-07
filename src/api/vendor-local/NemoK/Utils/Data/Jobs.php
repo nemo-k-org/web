@@ -15,7 +15,27 @@ class Jobs {
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
     }
 
-    function getJob($jobId) {
+    function add($jobId, $parameters, $customerId, $userAgentId, $remoteAddress) {
+        $sql = 'INSERT INTO `jobs` SET `jobId`=?, `parameters`=?, `customerId`=?, `userAgentId`=?, `ip`=?';
+
+        try {
+            $stmt = $this->dbal->prepare($sql);
+            $stmt->bindValue(1, $jobId);
+            $stmt->bindValue(2, json_encode($jobParameters));
+            $stmt->bindValue(3, $customerId);
+            $stmt->bindValue(4, $userAgentId);
+            $stmt->bindValue(5, $remoteAddress);
+    
+            $stmt->executeQuery();
+        } catch (\Exception $e) {
+            $this->logger->error('Database error', [$sql, $e]);
+            return false;
+        }
+
+        return true;
+    }
+
+    function get($jobId) {
         $sql = 'SELECT * FROM `jobs` WHERE `jobId`=?;';
         try {
             $stmt = $this->dbal->prepare($sql);
@@ -27,12 +47,12 @@ class Jobs {
         }
 
         if ($result->rowCount() < 1) {
-            $this->logger->debug('getJob did not find any job details', [$jobId]);
+            $this->logger->debug('get() did not find any job details', [$jobId]);
             return null;
         }
 
         if ($result->rowCount() > 1) {
-            $this->logger->warning('getJob found more than one job details, using only the first', [$jobId]);
+            $this->logger->warning('get() found more than one job details, using only the first', [$jobId]);
         }
 
         $job = $result->fetchAssociative();
