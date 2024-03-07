@@ -16,8 +16,6 @@ $logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
 $http = new Utils\Http();
 $post = $http->getInputParameters();
 
-$logger->debug('Post variables', [$post]);
-
 $inputValidator = new Utils\InputValidator();
 $customerCode = null;
 if (@$post['customerCode']) {
@@ -50,6 +48,8 @@ $router->add('post', '/api/jobs/([\w\d\-]+?)/firmware$', null, function($routeMa
 
 $method = strtolower($_SERVER['REQUEST_METHOD']);
 $uri = strtolower($_SERVER['REQUEST_URI']);
+
+$logger->debug('Routing...', [$method, $uri, $post, $jobParameters]);
 
 [$response, $statusCode] = $router->route($method, $uri, $customerCode);
 
