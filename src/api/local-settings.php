@@ -21,6 +21,7 @@ define('DB_ADMIN', [
 ]);
 
 define('AWS_CODEBUILD', [
+    'credentialsPath' => getenv('HOME').'/.aws/credentials',
     'profile' => 'NemoK',
     'version' => '2016-10-06',
     'region' => 'eu-central-1',

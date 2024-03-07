@@ -12,10 +12,13 @@ class CodeBuild {
     function __construct($aws_settings) {
         $this->aws_settings = $aws_settings;
 
+        $provider = CredentialProvider::ini($this->aws_settings['profile'], $this->aws_settings['credentialsPath']);
+        $provider = CredentialProvider::memoize($provider);
+
         $this->aws_client = new CodeBuildClient([
-            'profile' => $this->aws_settings['profile'],
             'region' => $this->aws_settings['region'],
-            'version' => $this->aws_settings['version']
+            'version' => $this->aws_settings['version'],
+            'credentials' => $provider,
         ]);
     }
 
