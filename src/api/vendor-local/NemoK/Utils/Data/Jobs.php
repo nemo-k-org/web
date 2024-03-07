@@ -1,6 +1,6 @@
 <?php
 
-namespace NemoK\Data;
+namespace NemoK\Utils\Data;
 
 use Doctrine\DBAL\DriverManager;
 use Monolog\Logger;
@@ -15,13 +15,18 @@ class Jobs {
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
     }
 
-    function add($jobId, $parameters, $customerId, $userAgentId, $remoteAddress) {
+    function add($jobId, $parameters, $customerId, $userAgent, $remoteAddress) {
+        $parametersJson = json_encode($parameters);
+
+        $userAgents = new UserAgents();
+        $userAgentId = $userAgents->getUserAgentId($userAgent);
+
         $sql = 'INSERT INTO `jobs` SET `jobId`=?, `parameters`=?, `customerId`=?, `userAgentId`=?, `ip`=?';
 
         try {
             $stmt = $this->dbal->prepare($sql);
             $stmt->bindValue(1, $jobId);
-            $stmt->bindValue(2, json_encode($jobParameters));
+            $stmt->bindValue(2, $parametersJson);
             $stmt->bindValue(3, $customerId);
             $stmt->bindValue(4, $userAgentId);
             $stmt->bindValue(5, $remoteAddress);

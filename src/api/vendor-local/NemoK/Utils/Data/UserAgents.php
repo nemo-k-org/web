@@ -1,6 +1,6 @@
 <?php
 
-namespace NemoK\Utils;
+namespace NemoK\Utils\Data;
 
 use Doctrine\DBAL\DriverManager;
 use Monolog\Logger;
@@ -8,6 +8,7 @@ use Monolog\Handler\StreamHandler;
 
 class UserAgents {
     private $dbal;
+    private $logger;
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);

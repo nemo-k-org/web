@@ -17,7 +17,7 @@ class Jobs {
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
 
         $this->jobStatus = new Data\JobStatus();
-        $this->jobs = new Data\Jobs();
+        $this->jobs = new Utils\Data\Jobs();
     }
 
     function add($customerId, $jobParameters, $userAgent, $remoteAddress) {
@@ -29,12 +29,7 @@ class Jobs {
             return [null, Utils\Http::STATUS_CODE_ERROR_MISSING_PARAMETERS];
         }
 
-        $jobParametersStr = json_encode($jobParameters);
-
-        $userAgents = new \NemoK\Utils\UserAgents();
-        $userAgentId = $userAgents->getUserAgentId($userAgent);
-
-        if (!$this->jobs->add($jobId, $parameters, $customerId, $userAgentId, $remoteAddress)) {
+        if (!$this->jobs->add($jobId, $jobParameters, $customerId, $userAgent, $remoteAddress)) {
             return [null, Utils\Http::STATUS_CODE_ERROR];
         }
 
