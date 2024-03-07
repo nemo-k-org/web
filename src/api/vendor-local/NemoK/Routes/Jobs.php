@@ -107,7 +107,7 @@ class Jobs {
             return [$jobId, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
         }
 
-        $this->jobStatus->add($jobId, 'submitted');
+        $this->jobStatus->add($jobId, 'received');
 
         return [$jobId, Utils\Http::STATUS_CODE_OK];
     }
