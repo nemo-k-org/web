@@ -2,11 +2,18 @@
 
 namespace NemoK\Utils;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 class Router {
     private $routes;
+    private $logger;
 
     function __construct() {
         $this->routes = [];
+
+        $this->logger = $logger = new Logger("Router");
+        $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
     }
 
     function add($method, $routeRegexp, $parameter, $action) {
@@ -34,8 +41,6 @@ class Router {
     }
 
     function route($method, $uri, $customerCode) {
-        $result = null;
-
         $customerId = null;
         if (!is_null($customerCode)) {
             $customers = new Data\Customers();
@@ -49,6 +54,7 @@ class Router {
             if ($matchMethod and $matchRoute === 1) {
                 if ($route['requireAuthorisation']) {
                     if (is_null($customerId)) {
+                        $this->logger->debug('Authorisation missing', [$route]);
                         continue;
                     }
                     else {
@@ -56,13 +62,15 @@ class Router {
                     }
                 }
 
-                $result = $this->callRoute($route, $routeParams, $customerId);
+                $this->logger->debug('Route match', [$route]);
 
-                break;
+                return $this->callRoute($route, $routeParams, $customerId);
             }
         }
 
-        return $result;
+        $this->logger->debug('None of the routes match', [$method, $uri, $customerCode]);
+
+        return [null, Http::STATUS_CODE_NOT_FOUND];
     }
 
     private function callRoute($route, $routeParams, $customerId) {
