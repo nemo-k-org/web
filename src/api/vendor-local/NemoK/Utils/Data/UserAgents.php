@@ -12,7 +12,7 @@ class UserAgents {
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);
-        $this->logger = $logger = new Logger("UserAgents");
+        $this->logger = $logger = new Logger("Data-UserAgents");
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
     }
 

@@ -17,7 +17,7 @@ class JobStatus {
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);
-        $this->logger = $logger = new Logger("Data-Jobs");
+        $this->logger = $logger = new Logger("Data-JobStatus");
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
     }
 
