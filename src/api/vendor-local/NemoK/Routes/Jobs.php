@@ -10,6 +10,7 @@ class Jobs {
     private $dbal;
     private $jobStatus;
     private $jobs;
+    private $firmwares;
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);
@@ -18,6 +19,7 @@ class Jobs {
 
         $this->jobStatus = new Data\JobStatus();
         $this->jobs = new Utils\Data\Jobs();
+        $this->firmwares = new Utils\Data\Firmwares();
     }
 
     function add($customerId, $jobParameters, $userAgent, $remoteAddress) {
@@ -78,38 +80,13 @@ class Jobs {
     function updateFirmware($jobId, $firmwareTempFilename) {
         $this->logger->debug('updateFirmware', [$jobId, $firmwareTempFilename]);
 
-        if (!is_dir(FIRMWARE_PATH)) {
-            if (!mkdir(FIRMWARE_PATH, 0700)) {
-                $this->logger->error("Firmware path does not exist and I was unable to create it", [FIRMWARE_PATH]);
-                unlink($firmwareTempFilename);
-                return [$jobId, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
-            }
-        }
-        $firmwareFile = new Utils\FirmwareFile($firmwareTempFilename);
-        if (!$firmwareFile->isValidFirmwareZip()) {
-            $this->logger->warning("Job ID was updated with failing firmware file", [$jobId, $firmwareFile->errorMessage]);
-            unlink($firmwareTempFilename);
-            return [$jobId, Utils\Http::STATUS_CODE_ERROR_FAILED_FILE_UPLOAD];
+        $status = $this->firmwares->add($jobId, $firmwareTempFilename);
+
+        if ($status === Utils\Http::STATUS_CODE_OK) {
+            $this->jobStatus->add($jobId, 'received');
         }
 
-        $firmwareFinalFilename = FIRMWARE_PATH.'/'.$jobId;
-        if (is_file($firmwareFinalFilename)) {
-            if (!unlink($firmwareFinalFilename)) {
-                $this->logger->error("Could not unlink already existing firmware file", [$jobId, $firmwareFinalFilename]);
-                unlink($firmwareTempFilename);
-                return [$jobId, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
-            }
-        }
-
-        if (!$firmwareFile->unzipFirmwareTo($firmwareFinalFilename)) {
-            $this->logger->error("Could not extract firmware", [$jobId, $firmwareFile->errorMessage]);
-            unlink($firmwareTempFilename);
-            return [$jobId, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
-        }
-
-        $this->jobStatus->add($jobId, 'received');
-
-        return [$jobId, Utils\Http::STATUS_CODE_OK];
+        return [$jobId, $status];
     }
 }
 ?>
