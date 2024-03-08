@@ -13,6 +13,7 @@ class JobStatus {
     // 'received' - firmware has been successfully received from CI
 
     private $dbal;
+    private $logger;
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);

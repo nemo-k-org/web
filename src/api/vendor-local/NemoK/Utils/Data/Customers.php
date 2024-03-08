@@ -8,6 +8,7 @@ use Monolog\Handler\StreamHandler;
 
 class Customers {
     private $dbal;
+    private $logger;
 
     function __construct() {
         $this->dbal = $db = DriverManager::getConnection(DB_API);
