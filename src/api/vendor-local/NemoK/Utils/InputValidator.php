@@ -24,9 +24,22 @@ class InputValidator {
 
             $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_ssid'], 'SSID');
             $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_pass'], 'WiFi password');
+
+            if ($this->missingRequiredFields($validatedParameters, ['NEMOK_WIFI_SSID', 'NEMOK_WIFI_PASS'])) {
+                throw new \Exception('Missing required parameters');
+            }
         }
 
         return $validatedParameters;
+    }
+
+    function missingRequiredFields($parameters, $fields) {
+        foreach ($fields as $thisField) {
+            if (is_null($parameters[$thisField])) return true;
+            if ($parameters[$thisField] == '') return true;
+        }
+
+        return false;
     }
 
     function validateAlphanumeric($str, $field=null) {
