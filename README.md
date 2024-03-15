@@ -95,3 +95,11 @@ Submit a new firmware compilation job.
 Submit/update a new firmware binary for the job `jobId`.
 
 `curl -X POST -F "firmware=@firmware.zip" http://localhost:8080/api/jobs/[jobId]/firmware`
+
+## Tests
+
+Give database connection parameters as environment variables, e.g.
+
+```
+DB_USERNAME=nemok_admin DB_PASSWORD=nemok_admin_password DB_DATABASE=nemok make test
+```
