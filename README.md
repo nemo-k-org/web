@@ -100,6 +100,8 @@ Submit/update a new firmware binary for the job `jobId`.
 
 Give database connection parameters as environment variables, e.g.
 
-```
-DB_USERNAME=nemok_admin DB_PASSWORD=nemok_admin_password DB_DATABASE=nemok make test
-```
+`DB_USERNAME=nemok_admin DB_PASSWORD=nemok_admin_password DB_DATABASE=nemok make test`
+
+To run backend without making calls to AWS:
+
+`NEMOK_AWS_DRYRUN=1 make start`

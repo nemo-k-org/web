@@ -68,7 +68,7 @@ class Jobs {
             return false;
         }
 
-        $this->logger->debug('Codebuild job submitted');
+        $this->logger->debug('Codebuild job submitted', [$response]);
 
         return true;
     }

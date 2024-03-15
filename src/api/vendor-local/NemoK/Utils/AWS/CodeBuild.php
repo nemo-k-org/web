@@ -22,8 +22,20 @@ class CodeBuild {
         ]);
     }
 
+    function dryRun() {
+        if ($this->aws_settings['dryRun'] != '') {
+            return true;
+        }
+
+        return false;
+    }
+
     function submitBuild($jobId, $jobParameters) {
         $jobParametersAWS = $this->jobParametersToAWSFormat($jobParameters);
+
+        if ($this->dryRun()) {
+            return ['AWS_dry_run' => true];
+        }
 
         $response = $this->aws_client->startBuild([
             'projectName' => $this->aws_settings['codeBuildProjectname'],
