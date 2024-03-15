@@ -1,5 +1,4 @@
 import { test, expect, request } from '@playwright/test'
-import { env } from 'node:process'
 import { UtilDatabase } from './util/UtilDatabase'
 
 test('should give 404 if no authorisation sent', async ({ request }) => {
