@@ -18,6 +18,7 @@ test('should give 404 if nonexisting authorisation sent', async ({ request }) =>
 test('should require a defined set of parameters', async () => {
     const utilDatabase = new UtilDatabase()
     const customerData = await utilDatabase.addCustomer()
+
     expect(customerData.customerId).toBeGreaterThan(0)
 
     const testGrid = [
