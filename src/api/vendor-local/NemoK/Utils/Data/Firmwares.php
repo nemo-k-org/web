@@ -55,7 +55,7 @@ class Firmwares {
         if (!$this->unzipFirmware($uploadedFile, $firmwareFinalFilename)) {
             $this->logger->error("Could not extract firmware", [$jobId, $uploadedFile, $firmwareFinalFilename]);
             unlink($firmwareFinalFilename);
-            return Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR;
+            return Http::STATUS_CODE_ERROR_FAILED_FILE_UPLOAD;
         }
 
         return Http::STATUS_CODE_OK;
