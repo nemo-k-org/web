@@ -94,6 +94,7 @@ test('should require a defined set of parameters', async () => {
                     nemok_wifi_pass: 'test-pass'
                 }
             },
+            body: customerData.customerCode,
             expectedStatus: 200,
             case: 'contains all required parameters'
         }
@@ -104,5 +105,10 @@ test('should require a defined set of parameters', async () => {
     for (const thisTest of testGrid) {
         const response = await apiContext.post('jobs', { data: thisTest.params })
         expect(response.status(), { message: thisTest.case }).toBe(thisTest.expectedStatus)
+
+        if (thisTest.body) {
+            const responseBody = JSON.parse(await response.text())
+            expect(responseBody, { message: thisTest.case }).not.toBe('')
+        }
     }
 })
