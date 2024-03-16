@@ -1,6 +1,13 @@
 import { test, expect, request } from '@playwright/test'
 import { UtilDatabase } from './util/UtilDatabase'
 
+const CUSTOMER_EMAIL = 'post-jobs@test.com'
+
+test.afterAll(async () => {
+    const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
+    await utilDatabase.removeTestCustomersAndJobs()
+})
+
 test('should give 404 if no authorisation sent', async ({ request }) => {
     const noData = await request.post('jobs', {})
     expect(noData.status()).toBe(404)
@@ -16,7 +23,7 @@ test('should give 404 if nonexisting authorisation sent', async ({ request }) =>
 })
 
 test('should require a defined set of parameters', async () => {
-    const utilDatabase = new UtilDatabase()
+    const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
     const customerData = await utilDatabase.addCustomer()
 
     expect(customerData.customerId).toBeGreaterThan(0)

@@ -8,5 +8,5 @@ export default defineConfig({
   outputDir: '../test-results/playwright/',
   retries: process.env.CI ? 2 : 0,
   testMatch: 'test/*.api.spec.ts',
-  workers: 1
+  workers: 2
 })
