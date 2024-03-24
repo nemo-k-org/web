@@ -49,11 +49,21 @@ lint-js:
 build: lint-js build/bundle.js build/index.html build/index.css build/xterm.css build/xterm.js build/.htaccess api
 
 .PHONY: start
-start:
+start: stop
 	-rm -fR $(PWD)/apache/modules
 	ln -sf /usr/lib/apache2/modules $(PWD)/apache/
 	SERVER_ROOT=$(PWD) /usr/sbin/apache2 -X -f $(PWD)/apache2.conf
 
+start-test: stop
+	-rm -fR $(PWD)/apache/modules
+	ln -sf /usr/lib/apache2/modules $(PWD)/apache/
+	SERVER_ROOT=$(PWD) NEMOK_AWS_DRYRUN=1 /usr/sbin/apache2 -f $(PWD)/apache2.conf
+
+.PHONY: stop
+stop:
+	if [ -f apache/httpd.pid ]; then kill -TERM `cat apache/httpd.pid`; sleep 2; fi
+
 .PHONY: test
-test:
+test: stop start-test
 	npx playwright test --config=test/playwright.api.config.ts
+	if [ -f apache/httpd.pid ]; then kill -TERM `cat apache/httpd.pid`; fi

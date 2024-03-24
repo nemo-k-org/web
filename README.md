@@ -22,7 +22,9 @@ git clone git@github.com:nemo-k-org/web.git
 cd web
 npm install
 make build
+make test
 make start
+make stop
 ```
 
 ## Database
@@ -77,7 +79,7 @@ are needed.
 
 Customers can be added directly to the database:
 
-`INSERT INTO `customers` SET `customerCode`=UUID(), `email`='user@email', `added`=NOW();`
+``INSERT INTO `customers` SET `customerCode`=UUID(), `email`='user@email', `added`=NOW();``
 
 * Currently email is recorded only for the reference
 * Starting a new job requires an existing Customer Code so this should be given to the customer
@@ -98,10 +100,12 @@ Submit/update a new firmware binary for the job `jobId`.
 
 ## Tests
 
-Give database connection parameters as environment variables, e.g.
-
-`DB_USERNAME=nemok_admin DB_PASSWORD=nemok_admin_password DB_DATABASE=nemok make test`
+The tests read database connection parameters from `build/local-settings.php`.
 
 To run backend without making calls to AWS:
 
 `NEMOK_AWS_DRYRUN=1 make start`
+
+Both of these can be achieved simply by saying
+
+`make test`

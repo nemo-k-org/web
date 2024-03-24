@@ -1,6 +1,8 @@
 import { env } from 'node:process'
 import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { v4 as uuidv4 } from 'uuid'
+import fs from 'fs'
+import readline from 'readline'
 
 export interface customerData {
     customerId: number;
@@ -18,6 +20,10 @@ export class UtilDatabase {
     private pool: mysql.Pool
     private customerEmail: string
 
+    private dbUsername: string
+    private dbPassword: string
+    private dbDatabase: string
+
     constructor(customerEmail?: string) {
         if (customerEmail) {
             this.customerEmail = customerEmail
@@ -25,7 +31,63 @@ export class UtilDatabase {
         else {
             this.customerEmail = DEFAULT_CUSTOMER_EMAIL
         }
+
+        if (env.DB_USERNAME) {
+            this.dbUsername = env.DB_USERNAME
+        }
+        if (env.DB_PASSWORD) {
+            this.dbPassword = env.DB_PASSWORD
+        }
+        if (env.DB_DATABASE) {
+            this.dbDatabase = env.DB_DATABASE
+        }
     }
+
+    async getDatabaseSettingsFromLocalSettingsFile(localSettingsFilename: string) {
+        this.dbUsername = ''
+        this.dbPassword = ''
+        this.dbDatabase = ''
+
+        let adminSettingsStarted = false
+        const reAdminSettings = /'DB_ADMIN'/
+        const reUsername = /['"]user['"].+['"](.*?)['"]/
+        const rePassword = /['"]password['"].+['"](.*?)['"]/
+        const reDatabase = /['"]dbname['"].+['"](.*?)['"]/
+
+        const fileStream = fs.createReadStream(localSettingsFilename)
+        const rl = readline.createInterface({
+            input: fileStream,
+            crlfDelay: Infinity
+        })
+
+        for await (const line of rl) {
+            if (line.match(reAdminSettings)) {
+                adminSettingsStarted = true
+            }
+
+            if (adminSettingsStarted && !this.dbUsername) {
+                const match = line.match(reUsername)
+                if (match) {
+                    this.dbUsername = match[1]
+                }
+            }
+
+            if (adminSettingsStarted && !this.dbPassword) {
+                const match = line.match(rePassword)
+                if (match) {
+                    this.dbPassword = match[1]
+                }
+            }
+
+            if (adminSettingsStarted && !this.dbDatabase) {
+                const match = line.match(reDatabase)
+                if (match) {
+                    this.dbDatabase = match[1]
+                }
+            }
+        }
+    }
+
 
     async createConnection() {
         if (this.pool) {
@@ -34,9 +96,9 @@ export class UtilDatabase {
 
         this.pool = mysql.createPool({
             host: 'localhost',
-            user: DB_USERNAME,
-            password: DB_PASSWORD,
-            database: DB_DATABASE,
+            user: this.dbUsername,
+            password: this.dbPassword,
+            database: this.dbDatabase,
             waitForConnections: true,
             connectionLimit: 10,
             maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
