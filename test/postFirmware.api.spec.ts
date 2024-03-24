@@ -3,9 +3,11 @@ import { UtilDatabase } from './util/UtilDatabase'
 import fs from 'fs'
 
 const CUSTOMER_EMAIL = 'post-firmware-api@test.com'
+const LOCAL_SETTINGS = 'build/local-settings.php'
 
 test.afterAll(async () => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
+    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
     await utilDatabase.removeTestCustomersAndJobs()
 })
 
@@ -21,6 +23,7 @@ test('firmware upload should give 404 if job id missing', async ({ request }) =>
 
 test('firmware upload should give error if no zip file given', async ({ request }) => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
+    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
     const customerData = await utilDatabase.addCustomer()
     expect(customerData.customerId).toBeGreaterThan(0)
 
@@ -37,6 +40,7 @@ test('firmware upload should give error if no zip file given', async ({ request 
 
 test('firmware upload should check zip and its content', async () => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
+    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
     const customerData = await utilDatabase.addCustomer()
 
     expect(customerData.customerId).toBeGreaterThan(0)

@@ -2,9 +2,11 @@ import { test, expect, request } from '@playwright/test'
 import { UtilDatabase } from './util/UtilDatabase'
 
 const CUSTOMER_EMAIL = 'post-jobs@test.com'
+const LOCAL_SETTINGS = 'build/local-settings.php'
 
 test.afterAll(async () => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
+    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
     await utilDatabase.removeTestCustomersAndJobs()
 })
 
@@ -24,6 +26,7 @@ test('should give 404 if nonexisting authorisation sent', async ({ request }) =>
 
 test('should require a defined set of parameters', async () => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
+    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
     const customerData = await utilDatabase.addCustomer()
 
     expect(customerData.customerId).toBeGreaterThan(0)
