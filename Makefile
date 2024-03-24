@@ -1,8 +1,10 @@
 composer.phar: tools/install-composer.sh
-#	tools/install-composer.sh
+	tools/install-composer.sh
+	touch composer.phar
 
 phpab.phar: tools/install-phpab.sh
-#	tools/install-phpab.sh
+	tools/install-phpab.sh
+	touch phpab.phar
 
 build/index.html: src/html/index.html
 	cp src/html/index.html build/
