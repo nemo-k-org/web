@@ -12,14 +12,19 @@
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" href="#" id="tabButtonSubmit">Submit Job</a>
+                <a class="nav-link active" href="#" id="tabButtonSubmit">Create</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" id="tabButtonFlash">Flash Microcontroller</a>
+                <a class="nav-link" href="#" id="tabButtonFlash">Upload</a>
             </li>
         </ul>
 
         <div id="tabSubmit" class="tabArea">
+            <p>
+                Start by creating a program for your microcontroller. Choose the sensor
+                type and select the options below. After a successful job submission you
+                get a Job ID which you need to upload the program to microcontroller.
+            </p>
             <p>Select sensor type:</p>
             <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
             <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
@@ -63,29 +68,56 @@
         </div>
 
         <div id="tabFlash" class="tabArea">
-            <h2>Connect to serial</h2>
+            <h2>Step 1: Connect to serial (USB)</h2>
 
             <p>
-                <button id="buttonConnect">Connect</button>
+                Connect your microcontroller to your computer using an USB cable.
+                After this click the button below and open connection to the
+                correct device.
+            </p>
+            <p>
+                <button id="buttonConnect" class="btn btn-primary">Open connection</button>
             </p>
     
-            <h2>Flash file</h2>
+            <h2>Step 2: Upload program to microcontroller</h2>
     
+            <p>
+                When you have opened the connection you are ready to upload (flash) the
+                program (firmware) to your microcontroller. The prepared program file
+                is identified by the Job ID. Make sure the desired Job ID is below.
+            </p>
+
+            <div class="form-group">
+                <label for="tabFlashJobId">Job ID to flash</label>
+                <input type="text" class="form-control" id="tabFlashJobId" aria-describedby="tabFlashJobIdHelp">
+                <small id="tabFlashJobIdHelp" class="form-text text-muted">
+                    You should get your Job ID after a successful job submission.
+                </small>
+            </div>
+
             <p>
                 File: <input type="file" id="fileFirmware"/>
             </p>
             <p>
-                <button id="buttonFlash">Flash file</button>
+                <button id="buttonFlash" class="btn btn-primary">Upload program</button>
             </p>
     
-            <h2>Disconnect from serial</h2>
+            <h2>Step 3: Close serial (USB) connection</h2>
     
             <p>
-                <button id="buttonDisconnect">Disconnect</button>
+                After a successful upload disconnect the connection to your
+                device.
+            </p>
+            <p>
+                <button id="buttonDisconnect" class="btn btn-primary">Close connection</button>
             </p>
     
             <h2>Terminal</h2>
     
+            <p>
+                The terminal window below may contain information which may help
+                in solving technical problems in uploading.
+            </p>
             <div id="terminal"></div>
         </div>
     </body>
