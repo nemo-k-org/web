@@ -47,6 +47,29 @@ class Jobs {
         return [$jobId, Utils\Http::STATUS_CODE_OK];
     }
 
+    function getStatus($customerId, $jobId) {
+        $jobData = $this->jobs->get($jobId);
+
+        if (is_null($jobData)) {
+            $this->logger->debug('Given jobId does not exist', [$jobId]);
+            return [null, Utils\Http::STATUS_CODE_NOT_FOUND];
+        }
+
+        if ($jobData['customerId'] != $customerId) {
+            $this->logger->debug('Authorised customerId and customerId of the given job do not match', [$customerId, $jobData]);
+            return [null, Utils\Http::STATUS_CODE_UNAUTHORIZED];
+        }
+
+        $jobStatus = $this->jobStatus->get($jobId);
+
+        if (is_null($jobStatus)) {
+            $this->logger->error("Could not get job status", [$jobId, $customerId]);
+            return [null, Utils\Http::STATUS_CODE_ERROR];
+        }
+
+        return [$jobStatus, Utils\Http::STATUS_CODE_OK];
+    }
+
     private function submitJobToCI($jobId) {
         $jobData = $this->jobs->get($jobId);
 

@@ -50,6 +50,31 @@ class JobStatus {
 
         return true;
     }
+
+    function get($jobId) {
+        if (is_null($jobId) or $jobId == '') {
+            return null;
+        }
+
+        $sql = 'SELECT `jobStatus` FROM `status` WHERE jobId=? ORDER BY updated DESC LIMIT 1;';
+        try {
+            $stmt = $this->dbal->prepare($sql);
+            $stmt->bindValue(1, $jobId);
+
+            $result = $stmt->executeQuery();
+        } catch (\Exception $e) {
+            $this->logger->error('Database error', [$sql, $e]);
+            return null;
+        }
+
+        if ($result->rowCount() < 1) {
+            $this->logger->debug('get() did not find any job details', [$jobId]);
+            return null;
+        }
+
+        $status = $result->fetchAssociative();
+        return $status['jobStatus'];
+    }
 }
 
 ?>
