@@ -119,7 +119,7 @@ Return values:
 Query job status.
 * The `customerCode` must be an owner of given job `jobId`.
 
-`curl -X GET -d '{"customerCode":"valid-customer-code"}' http://localhost:8080/api/jobs/[jobId]/status`
+`curl -H 'NemoK-CustomerCode: [customerCode]' http://localhost:8080/api/jobs/[jobId]/status`
 
 Return values:
 * job status as JSON-encoded body text

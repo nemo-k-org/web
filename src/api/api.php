@@ -25,6 +25,13 @@ if (@$post['customerCode']) {
         $logger->debug("Given customerCode is not valid UUID", [$post['customerCode']]);
     }
 }
+if (@$_SERVER['HTTP_NEMOK_CUSTOMERCODE']) {
+    try {
+        $customerCode = $inputValidator->validateUuid($_SERVER['HTTP_NEMOK_CUSTOMERCODE']);
+    } catch (\Exception $e) {
+        $logger->debug("Given header NemoK-CustomerCode is not valid UUID", [$_SERVER['HTTP_NEMOK_CUSTOMERCODE']]);
+    }
+}
 
 try {
     $jobParameters = $inputValidator->getValidatedJobParameters(@$post['jobParameters']);

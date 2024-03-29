@@ -37,13 +37,13 @@ test('job submission should respond with correct status', async ({ request }) =>
     const responseQueryWithoutCustomerCode = await request.get(`jobs/${jobId}/status`)
     expect(responseQueryWithoutCustomerCode.status()).toBe(404)
 
-    const responseQueryWithEmptyCustomerCode = await request.get(`jobs/${jobId}/status`, { data: {customerCode: '' }})
+    const responseQueryWithEmptyCustomerCode = await request.get(`jobs/${jobId}/status`, { headers: {'NemoK-CustomerCode': '' }})
     expect(responseQueryWithEmptyCustomerCode.status()).toBe(404)
 
-    const responseQueryWithWrongCustomerCode = await request.get(`jobs/${jobId}/status`, { data: {customerCode: customerDataMalicious.customerCode }})
+    const responseQueryWithWrongCustomerCode = await request.get(`jobs/${jobId}/status`, { headers: {'NemoK-CustomerCode': customerDataMalicious.customerCode }})
     expect(responseQueryWithWrongCustomerCode.status()).toBe(401)
 
-    const responseQueryWithCustomerCode = await request.get(`jobs/${jobId}/status`, { data: { customerCode: customerData.customerCode }})
+    const responseQueryWithCustomerCode = await request.get(`jobs/${jobId}/status`, { headers: { 'NemoK-CustomerCode': customerData.customerCode }})
     expect(responseQueryWithCustomerCode.ok()).toBeTruthy()
     expect(JSON.parse(await responseQueryWithCustomerCode.text())).toBe('submitted')
 })
@@ -74,7 +74,7 @@ test('firmware post should response with correct status', async ({ request}) => 
         customerCode: customerData.customerCode
     }
 
-    const responseStatus = await request.get(`jobs/${jobId}/status`, { data: params })
+    const responseStatus = await request.get(`jobs/${jobId}/status`, { headers: {'NemoK-CustomerCode': customerData.customerCode }})
     expect(responseStatus.ok()).toBeTruthy()
     expect(JSON.parse(await responseStatus.text())).toBe('received')
   
