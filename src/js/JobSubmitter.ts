@@ -10,6 +10,9 @@ interface SensorParametersTest {
 
 class JobSubmitter {
   selectedSensor: string
+  submittedJobId: string
+  jobStatusPollingHandle: number
+  jobStatusPollingInterval = 10000
 
   constructor () {
     window.addEventListener('load', () => {
@@ -45,7 +48,7 @@ class JobSubmitter {
     m.RemoveClass(buttonSelector, 'btn-secondary')
     m.AddClass(buttonSelector, 'btn-primary')
 
-    m.SetText('#submitJobResponse', '')
+    m.SetText('#submitJobStatus', '')
   }
 
   getSensorParameters = (): SensorParametersTest|null => {
@@ -61,6 +64,7 @@ class JobSubmitter {
   }
 
   submitJob = async () => {
+    this.submittedJobId = ''
     const jobParameters = this.getSensorParameters()
 
     try {
@@ -69,19 +73,55 @@ class JobSubmitter {
         customerCode: m.GetFormInputValue('#customerCode')
       })
 
-      m.SetText('#submitJobResponse', `Job submitted, id: ${response.data}`)
+      m.SetText('#submitJobStatus', `Job submitted, id: ${response.data}, please wait...`)
+      this.submittedJobId = response.data
+      this.pollJobStatusAfterTimeout()
     } catch (error) {
       console.error(error)
       if (error.response.status === 550) {
         if (error.response.data !== null && error.response.data !== '') {
-          m.SetText('#submitJobResponse', `Failed to submit job: ${error.response.data}`)
+          m.SetText('#submitJobStatus', `Failed to submit job: ${error.response.data}`)
         } else {
-          m.SetText('#submitJobResponse', 'Failed to submit job. Check job parameters. You may find more information in the browser console.')
+          m.SetText('#submitJobStatus', 'Failed to submit job. Check job parameters. You may find more information in the browser console.')
         }
       } else {
-        m.SetText('#submitJobResponse', 'Failed to submit job. See browser console for details.')
+        m.SetText('#submitJobStatus', 'Failed to submit job. See browser console for details.')
       }
     }
+  }
+
+  pollJobStatusAfterTimeout = () => {
+    if (this.jobStatusPollingHandle) {
+      clearTimeout(this.jobStatusPollingHandle)
+    }
+
+    this.jobStatusPollingHandle = window.setTimeout(async () => { await this.doJobStatusPolling() }, this.jobStatusPollingInterval)
+  }
+
+  doJobStatusPolling = async () => {
+    try {
+      const response = await axios.get(`/api/jobs/${this.submittedJobId}/status`, {
+        headers: {
+          'NemoK-CustomerCode': m.GetFormInputValue('#customerCode')
+        }
+      })
+
+      const jobStatus = response.data
+
+      if (jobStatus === 'submitted') {
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service, please wait...`)
+      } else if (jobStatus === 'received') {
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} is ready to be uploaded to your microcontroller.`)
+        m.SetFormInputValue('#tabFlashJobId', this.submittedJobId)
+      } else {
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} status: "${jobStatus}"`)
+      }
+    } catch (error) {
+      console.error(error)
+      m.SetText('#submitJobStatus', 'Error when querying job status. See browser log for details.')
+    }
+
+    this.pollJobStatusAfterTimeout()
   }
 }
 
