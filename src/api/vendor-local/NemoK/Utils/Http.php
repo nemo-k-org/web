@@ -4,6 +4,7 @@ namespace NemoK\Utils;
 
 class Http {
     const STATUS_CODE_OK = 200;
+    const STATUS_CODE_UNAUTHORIZED = 401;
     const STATUS_CODE_NOT_FOUND = 404;
     const STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR = 500;
     const STATUS_CODE_ERROR = 540;

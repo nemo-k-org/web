@@ -2,8 +2,7 @@ import { test, expect, request } from '@playwright/test'
 import { UtilDatabase } from './util/UtilDatabase'
 import fs from 'fs'
 
-const CUSTOMER_EMAIL = 'post-firmware-api@test.com'
-const LOCAL_SETTINGS = 'build/local-settings.php'
+import { CUSTOMER_EMAIL, LOCAL_SETTINGS } from './constants'
 
 test.afterAll(async () => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
