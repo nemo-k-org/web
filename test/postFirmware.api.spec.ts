@@ -55,10 +55,6 @@ test('firmware upload should check zip and its content', async () => {
         ['test/resources/nemo-k-firmware-ok.zip', 200],
     ]
 
-    const params = {
-        customerCode: customerData.customerCode
-    }
-
     const apiContext = await request.newContext()
 
     for (const testCase of testCases) {
