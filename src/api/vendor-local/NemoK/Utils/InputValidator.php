@@ -42,6 +42,19 @@ class InputValidator {
         return false;
     }
 
+    function validateNumeric($str, $field=null) {
+        if (preg_match('/[^\d]/', $str)) {
+            if (is_null($field)) {
+                throw new \Exception('given value is not alphanumeric');
+            }
+            else {
+                throw new \Exception('given value "'.$field.'" is not alphanumeric');
+            }
+        }
+
+        return $str;
+    }
+
     function validateAlphanumeric($str, $field=null) {
         if (preg_match('/[^\w\d\-_]/', $str)) {
             if (is_null($field)) {

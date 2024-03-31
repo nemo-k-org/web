@@ -20,6 +20,7 @@ class Jobs {
         $this->jobStatus = new Data\JobStatus();
         $this->jobs = new Utils\Data\Jobs();
         $this->firmwares = new Utils\Data\Firmwares();
+        $this->inputValidator = new Utils\InputValidator();
     }
 
     private function customerOwnsJob($customerId, $jobId) {
@@ -58,7 +59,9 @@ class Jobs {
     }
 
     function getAllJobsOwnedBy($customerId) {
-        $allJobs = $this->jobs->getOwnedBy($customerId);
+        $customerIdSafe = $this->inputValidator->validateNumeric($customerId, 'customerId');
+
+        $allJobs = $this->jobs->getOwnedBy($customerIdSafe);
 
         if (is_null($allJobs)) {
             return [null, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
@@ -68,22 +71,25 @@ class Jobs {
     }
 
     function getStatus($customerId, $jobId) {
-        $customerOwnsJob = $this->customerOwnsJob($customerId, $jobId);
+        $customerIdSafe = $this->inputValidator->validateNumeric($customerId, 'customerId');
+        $jobIdSafe = $this->inputValidator->validateUuid($jobId, 'jobId');
+
+        $customerOwnsJob = $this->customerOwnsJob($customerIdSafe, $jobIdSafe);
 
         if (is_null($customerOwnsJob)) {
-            $this->logger->debug('Given jobId does not exist', [$jobId]);
+            $this->logger->debug('Given jobId does not exist', [$jobIdSafe]);
             return [null, Utils\Http::STATUS_CODE_NOT_FOUND];
         }
 
         if (! $customerOwnsJob) {
-            $this->logger->debug('Authorised customerId and customerId of the given job do not match', [$customerId, $jobId]);
+            $this->logger->debug('Authorised customerId and customerId of the given job do not match', [$customerIdSafe, $jobIdSafe]);
             return [null, Utils\Http::STATUS_CODE_UNAUTHORIZED];
         }
 
-        $jobStatus = $this->jobStatus->get($jobId);
+        $jobStatus = $this->jobStatus->get($jobIdSafe);
 
         if (is_null($jobStatus)) {
-            $this->logger->error("Could not get job status", [$jobId, $customerId]);
+            $this->logger->error("Could not get job status", [$jobIdSafe, $customerIdSafe]);
             return [null, Utils\Http::STATUS_CODE_ERROR];
         }
 
@@ -91,21 +97,23 @@ class Jobs {
     }
 
     private function submitJobToCI($jobId) {
-        $jobData = $this->jobs->get($jobId);
+        $jobIdSafe = $this->inputValidator->validateUuid($jobId, 'jobId');
+
+        $jobData = $this->jobs->get($jobIdSafe);
 
         if (is_null($jobData)) {
             return false;
         }
 
         $jobParameters = $jobData['parameters'];
-        $jobParameters['NEMOK_UPLOAD_URL'] = $this->getFirmwareUploadURL($jobId);
+        $jobParameters['NEMOK_UPLOAD_URL'] = $this->getFirmwareUploadURL($jobIdSafe);
 
-        $this->logger->debug('submitting job to CI', [$jobId, $jobParameters]);
+        $this->logger->debug('submitting job to CI', [$jobIdSafe, $jobParameters]);
 
         $codeBuild = new Utils\AWS\CodeBuild(AWS_CODEBUILD);
 
         try {
-            $response = $codeBuild->submitBuild($jobId, $jobParameters);
+            $response = $codeBuild->submitBuild($jobIdSafe, $jobParameters);
         } catch (\Exception $e) {
             $this->logger->error('Failed to submit CodeBuild job', [$e]);
             return false;
@@ -121,31 +129,36 @@ class Jobs {
     }
 
     function updateFirmware($jobId, $firmwareTempFilename) {
-        $this->logger->debug('updateFirmware', [$jobId, $firmwareTempFilename]);
+        $jobIdSafe = $this->inputValidator->validateUuid($jobId, 'jobId');
 
-        $status = $this->firmwares->add($jobId, $firmwareTempFilename);
+        $this->logger->debug('updateFirmware', [$jobIdSafe, $firmwareTempFilename]);
+
+        $status = $this->firmwares->add($jobIdSafe, $firmwareTempFilename);
 
         if ($status === Utils\Http::STATUS_CODE_OK) {
-            $this->jobStatus->add($jobId, 'received');
+            $this->jobStatus->add($jobIdSafe, 'received');
         }
 
-        return [$jobId, $status];
+        return [$jobIdSafe, $status];
     }
 
     function getFirmware($customerId, $jobId) {
-        $customerOwnsJob = $this->customerOwnsJob($customerId, $jobId);
+        $customerIdSafe = $this->inputValidator->validateNumeric($customerId);
+        $jobIdSafe = $this->inputValidator->validateUuid($jobId);
+
+        $customerOwnsJob = $this->customerOwnsJob($customerIdSafe, $jobIdSafe);
 
         if (is_null($customerOwnsJob)) {
-            $this->logger->debug('Given jobId does not exist', [$jobId]);
+            $this->logger->debug('Given jobId does not exist', [$jobIdSafe]);
             return [null, Utils\Http::STATUS_CODE_NOT_FOUND];
         }
 
         if (! $customerOwnsJob) {
-            $this->logger->debug('Authorised customerId and customerId of the given job do not match', [$customerId, $jobId]);
+            $this->logger->debug('Authorised customerId and customerId of the given job do not match', [$customerIdSafe, $jobIdSafe]);
             return [null, Utils\Http::STATUS_CODE_UNAUTHORIZED];
         }
 
-        $firmwareStream = $this->firmwares->get($jobId);
+        $firmwareStream = $this->firmwares->get($jobIdSafe);
 
         if (is_null($firmwareStream)) {
             return [null, Utils\Http::STATUS_CODE_ERROR_FIRMWARE_FILE_MISSING];
