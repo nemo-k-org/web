@@ -27,6 +27,10 @@ class Firmwares {
         }
     }
 
+    private function getFirmwareFilename($jobId) {
+        return FIRMWARE_PATH.'/'.$jobId;
+    }
+
     function add($jobId, $uploadedFile) {
         if (!$this->ensureFirmwarePathExists()) {
             $this->logger->error("Could not ensure firmware path");
@@ -43,7 +47,7 @@ class Firmwares {
             return Http::STATUS_CODE_ERROR_FAILED_FILE_UPLOAD;
         }
 
-        $firmwareFinalFilename = FIRMWARE_PATH.'/'.$jobId;
+        $firmwareFinalFilename = $this->getFirmwareFilename($jobId);
 
         if (is_file($firmwareFinalFilename)) {
             if (!unlink($firmwareFinalFilename)) {
@@ -59,6 +63,15 @@ class Firmwares {
         }
 
         return Http::STATUS_CODE_OK;
+    }
+
+    function get($jobId) {
+        $firmwareFilename = $this->getFirmwareFilename($jobId);
+        if (!is_file($firmwareFilename)) {
+            return null;
+        }
+
+        return fopen('file://'.$firmwareFilename, 'r');
     }
 
     private function isProperFirmwareZip($uploadedFile) {

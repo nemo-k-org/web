@@ -114,7 +114,22 @@ Return values:
 * 404 - missing jobId (`jobId`)
 * 551 - zip file fails validity check (`firmware`)
 
-## GET `/api/jobs/[jobId]/status`
+### GET  `/api/jobs/[jobId]/firmware`
+
+Get firmware binary for the job `jobId`.
+* The `jobId` must be a valid job.
+* The `customerCode` must be an owner of given job `jobId`.
+
+`curl -H 'NemoK-CustomerCode: [customerCode]' http://localhost:8080/api/jobs/[jobId]/firmware`
+
+Return values:
+* firmware binary file as body (`application/octet-stream`)
+* 200 - success
+* 401 - given customer does not own given job
+* 404 - missing authorisation (`customerCode`)
+* 552 - firmware file does not exist on server
+
+### GET `/api/jobs/[jobId]/status`
 
 Query job status.
 * The `customerCode` must be an owner of given job `jobId`.
