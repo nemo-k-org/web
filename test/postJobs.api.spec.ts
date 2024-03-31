@@ -3,12 +3,6 @@ import { UtilDatabase } from './util/UtilDatabase'
 
 import { CUSTOMER_EMAIL, LOCAL_SETTINGS } from './constants'
 
-test.afterAll(async () => {
-    const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
-    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
-    await utilDatabase.removeTestCustomersAndJobs()
-})
-
 test('should give 404 if no authorisation sent', async ({ request }) => {
     const noData = await request.post('jobs', {})
     expect(noData.status()).toBe(404)
@@ -113,10 +107,10 @@ test('should require a defined set of parameters', async () => {
 
     for (const thisTest of testGrid) {
         const response = await apiContext.post('jobs', { data: thisTest.params })
-        expect(response.status(), { message: thisTest.case }).toBe(thisTest.expectedStatus)
+        expect(response.status(), { message: `${thisTest.case}, customerCode: ${customerData.customerCode}` }).toBe(thisTest.expectedStatus)
 
         if (thisTest.body) {
-            const responseBody = JSON.parse(await response.text())
+            const responseBody = await response.json()
             expect(responseBody, { message: thisTest.case }).not.toBe('')
         }
     }
