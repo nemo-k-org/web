@@ -66,4 +66,23 @@ class Jobs {
 
         return $job;
     }
+
+    function getOwnedBy($customerId) {
+        $sql = 'SELECT
+            `jobId`,`parameters`,
+            (SELECT jobStatus FROM `status` WHERE `jobs`.`jobId`=`status`.`jobId` ORDER BY `status`.`updated` DESC LIMIT 1)
+            AS `status` FROM `jobs` where customerId=?;
+        ';
+        try {
+            $stmt = $this->dbal->prepare($sql);
+            $stmt->bindValue(1, $customerId);
+
+            $result = $stmt->executeQuery();
+        } catch (\Exception $e) {
+            $this->logger->error('Database error', [$sql, $e]);
+            return null;
+        }
+
+        return $result->fetchAllAssociative();
+    }
 }

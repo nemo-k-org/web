@@ -48,6 +48,11 @@ $router->addAuthorised('post', '/api/jobs$', $jobParameters, function($routeMatc
     return $jobs->add($customerId, $jobParameters, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
 });
 
+$router->addAuthorised('get', '/api/customer/jobs$', $jobParameters, function($routeMatch, $customerId) {
+    $jobs = new Jobs();
+    return $jobs->getAllJobsOwnedBy($customerId);
+});
+
 $router->addAuthorised('get', '/api/jobs/([\w\d\-]+?)/status$', $jobParameters, function($routeMatch, $customerId) {
     $jobs = new Jobs();
     return $jobs->getStatus($customerId, $routeMatch[1]);

@@ -57,6 +57,16 @@ class Jobs {
         return [$jobId, Utils\Http::STATUS_CODE_OK];
     }
 
+    function getAllJobsOwnedBy($customerId) {
+        $allJobs = $this->jobs->getOwnedBy($customerId);
+
+        if (is_null($allJobs)) {
+            return [null, Utils\Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR];
+        }
+
+        return [$allJobs, Utils\Http::STATUS_CODE_OK];
+    }
+
     function getStatus($customerId, $jobId) {
         $customerOwnsJob = $this->customerOwnsJob($customerId, $jobId);
 

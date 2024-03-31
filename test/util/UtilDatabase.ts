@@ -16,6 +16,8 @@ const DB_USERNAME = env.DB_USERNAME
 const DB_PASSWORD = env.DB_PASSWORD
 const DB_DATABASE = env.DB_DATABASE
 
+export type JobStatus = 'created' | 'submitted' | 'received'
+
 export class UtilDatabase {
     private pool: mysql.Pool
     private customerEmail: string
@@ -165,6 +167,14 @@ export class UtilDatabase {
         return this.pool.query(
             'DELETE FROM `jobs` WHERE `jobId`=?', [jobId]
         )
+    }
+
+    async addStatus(jobId: string, status: JobStatus) {
+        await this.createConnection()
+
+        await this.pool.query(
+            'INSERT INTO `status` SET `jobId`=?, `jobStatus`=?',
+            [jobId, status]) as ResultSetHeader[]
     }
 
     async removeStatus(jobId: string): Promise<any> {

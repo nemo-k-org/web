@@ -86,6 +86,18 @@ Customers can be added directly to the database:
 
 ## API
 
+### GET `/api/customer/jobs`
+
+Get array of jobs owned by given `customerCode`.
+* The `customerCode` must be a valid customer in database table `customers`.
+
+`curl -H 'NemoK-CustomerCode: [customerCode]' http://localhost:8080/api/customer/jobs`
+
+Return values:
+* an array of jobs and status as JSON-encoded body text
+* 200 - success
+* 500 - unspecified server error
+
 ### POST `/api/jobs`
 
 Submit a new firmware compilation job.
