@@ -4,12 +4,6 @@ import fs from 'fs'
 
 import { CUSTOMER_EMAIL, LOCAL_SETTINGS } from './constants'
 
-test.afterAll(async () => {
-    const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
-    await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
-    await utilDatabase.removeTestCustomersAndJobs()
-})
-
 test('job submission should respond with correct status', async ({ request }) => {
     const utilDatabase = new UtilDatabase(CUSTOMER_EMAIL)
     await utilDatabase.getDatabaseSettingsFromLocalSettingsFile(LOCAL_SETTINGS)
