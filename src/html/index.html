@@ -70,37 +70,22 @@
                 </small>
             </div>
 
-            <h3>Step 1: Connect to serial (USB)</h3>
-
             <p>
-                Connect your microcontroller to your computer using an USB cable.
-                After this click the button below and open connection to the
-                correct device.
+                <ol>
+                    <li>
+                        Make sure the desired Job ID (program version) is above.
+                    </li>
+                    <li>
+                        Connect your microcontroller to your computer using an USB cable.
+                    </li>
+                    <li>
+                        After clicking the upload button select the microcontroller from the
+                        popup. Typically the correct entry says "USB Serial" or similar.
+                    </li>
+                </ol>
             </p>
             <p>
-                <button id="buttonFlashConnect" class="btn btn-primary">Open connection</button>
-            </p>
-    
-            <h3>Step 2: Upload program to microcontroller</h3>
-    
-            <p>
-                When you have opened the connection you are ready to upload (flash) the
-                program (firmware) to your microcontroller. The prepared program file
-                is identified by the Job ID. Make sure the desired Job ID is below.
-            </p>
-
-            <p>
-                <button id="buttonFlashUpload" class="btn btn-primary">Upload program</button>
-            </p>
-    
-            <h3>Step 3: Close serial (USB) connection</h3>
-    
-            <p>
-                After a successful upload disconnect the connection to your
-                device.
-            </p>
-            <p>
-                <button id="buttonFlashDisconnect" class="btn btn-primary">Close connection</button>
+                <button id="buttonFlash" class="btn btn-primary">Upload program to microcontroller</button>
             </p>
     
             <h3>Terminal</h3>

@@ -32,18 +32,12 @@ class FirmwareUploader {
   }
 
   activateButtons = () => {
-    m.OnClick('#buttonFlashConnect', (event: Event) => {
+    m.OnClick('#buttonFlash', async (event: Event) => {
       event.preventDefault()
-      this.serialConnect()
-    })
-    m.OnClick('#buttonFlashDisconnect', (event: Event) => {
-      event.preventDefault()
-      this.serialDisconnect()
-    })
-    m.OnClick('#buttonFlashUpload', async (event: Event) => {
-      event.preventDefault()
+      await this.serialConnect()
       await this.downloadFirmwareFromBackend()
       await this.uploadFirmwareToMicrocontroller()
+      await this.serialDisconnect()
     })
   }
 
