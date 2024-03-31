@@ -10,6 +10,7 @@ class Http {
     const STATUS_CODE_ERROR = 540;
     const STATUS_CODE_ERROR_MISSING_PARAMETERS = 550;
     const STATUS_CODE_ERROR_FAILED_FILE_UPLOAD = 551;
+    const STATUS_CODE_ERROR_FIRMWARE_FILE_MISSING = 552;
 
     function getInputParameters() {
         $requestBody = file_get_contents('php://input');
