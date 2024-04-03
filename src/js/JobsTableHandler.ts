@@ -34,6 +34,11 @@ class JobsTableHandler {
     return ' '
   }
 
+  cellRenderJobId = (data: any, cell: object, dataIndex: number, cellIndex: number): string => {
+    const jobId = data[0].data
+    return `<a href="#" data-bs-toggle="tooltip" data-bs-title="${jobId}" class="jobsTableLinkJobId">jobId</a>`
+  }
+
   activateTable = () => {
     const elementJobsTable: HTMLTableElement = document.querySelector(this.selectorJobsTable)
     this.jobsTable = new DataTable(elementJobsTable, {
@@ -60,7 +65,8 @@ class JobsTableHandler {
         },
         {
           select: 4,
-          sortable: true
+          sortable: false,
+          render: this.cellRenderJobId
         }
       ]
     })
@@ -72,16 +78,28 @@ class JobsTableHandler {
       this.startCountdownForNextJobStatusUpdate()
     })
 
+    m.OnClick('.jobsTableLinkJobId', this.eventClickedJobsTableLinkJobId)
+
     m.OnClick('.jobsTableButtonUpload', async (event: MouseEvent) => {
       const elButton = event.target as HTMLElement
       const elRow = elButton.parentNode.parentNode
-      const jobId = elRow.childNodes[4].textContent
+      const elJobIdLink = elRow.querySelector('[data-bs-title]')
+      const jobId = elJobIdLink.getAttribute('data-bs-title')
+
+      console.debug(jobId)
 
       const firmwareUploaded = await this.firmwareUploader.uploadFirmware(this.customerCode, jobId)
       if (!firmwareUploaded) {
         alert('Could not upload firmware for whatnot reason')
       }
     })
+  }
+
+  eventClickedJobsTableLinkJobId = (event: MouseEvent) => {
+    event.preventDefault()
+    const elLink = event.target as HTMLElement
+    const jobId = elLink.getAttribute('data-bs-title')
+    navigator.clipboard.writeText(jobId)
   }
 
   startCountdownForNextJobStatusUpdate = () => {
@@ -113,8 +131,10 @@ class JobsTableHandler {
   }
 
   jobsTableReplaceData = (newData: any) => {
+    document.querySelectorAll('.tooltip').forEach(el => el.remove())
     this.jobsTable.data.data = []
     this.jobsTable.insert({ data: newData.map((item: any) => this.jobsTableRowValues(item)) })
+    m.EnableTooltips()
   }
 
   doJobStatusPolling = async () => {
