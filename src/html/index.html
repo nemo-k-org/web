@@ -21,7 +21,19 @@
                 </small>
             </div>
 
-            <h2>Create your program</h2>
+            <h2>Your programs</h2>
+
+            <table id="tableJobs" class="table">
+                <thead>
+                    <th>Upload</th>
+                    <th>Status</th>
+                    <th>Age</th>
+                    <th>Parameters</th>
+                    <th>jobId</th>
+                </thead>
+            </table>
+
+            <h2>Create a new program</h2>
 
             <p>
                 Start by creating a program for your microcontroller. Choose the sensor
@@ -55,40 +67,11 @@
                 </div>
             </div>
 
-
             <button id="submitJob" type="button" class="btn btn-primary">Submit job</button>
 
             <div id="submitJobStatus"></div>
 
-            <h2>Upload the program to your microcontroller</h2>
-
-            <div class="form-group">
-                <label for="tabFlashJobId">Job ID to flash</label>
-                <input type="text" class="form-control" id="tabFlashJobId" aria-describedby="tabFlashJobIdHelp">
-                <small id="tabFlashJobIdHelp" class="form-text text-muted">
-                    You should get your Job ID after a successful job submission.
-                </small>
-            </div>
-
-            <p>
-                <ol>
-                    <li>
-                        Make sure the desired Job ID (program version) is above.
-                    </li>
-                    <li>
-                        Connect your microcontroller to your computer using an USB cable.
-                    </li>
-                    <li>
-                        After clicking the upload button select the microcontroller from the
-                        popup. Typically the correct entry says "USB Serial" or similar.
-                    </li>
-                </ol>
-            </p>
-            <p>
-                <button id="buttonFlash" class="btn btn-primary">Upload program to microcontroller</button>
-            </p>
-    
-            <h3>Terminal</h3>
+            <h2>Debug Terminal</h2>
     
             <p>
                 The terminal window below may contain information which may help

@@ -14,6 +14,8 @@ class Jobs {
         $this->dbal = $db = DriverManager::getConnection(DB_API);
         $this->logger = $logger = new Logger("Data-Jobs");
         $this->logger->pushHandler(new StreamHandler(LOG_FILE, LOG_LEVEL));
+
+        $this->firmwares = new Firmwares();
     }
 
     function add($jobId, $parameters, $customerId, $userAgent, $remoteAddress) {
@@ -70,8 +72,18 @@ class Jobs {
     function getOwnedBy($customerId) {
         $sql = 'SELECT
             `jobId`,`parameters`,
-            (SELECT jobStatus FROM `status` WHERE `jobs`.`jobId`=`status`.`jobId` ORDER BY `status`.`updated` DESC LIMIT 1)
-            AS `status` FROM `jobs` where customerId=?;
+            (SELECT jobStatus
+                FROM `status`
+                WHERE `jobs`.`jobId`=`status`.`jobId`
+                ORDER BY `status`.`updated` DESC LIMIT 1
+            ) AS `status`,
+            (SELECT
+                FLOOR(UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(`updated`))
+                FROM `status`
+                WHERE `jobs`.`jobId`=`status`.`jobId`
+                ORDER BY `status`.`updated` DESC LIMIT 1
+            ) AS `updatedSecsAgo`
+            FROM `jobs` where customerId=?;
         ';
         try {
             $stmt = $this->dbal->prepare($sql);
@@ -83,6 +95,13 @@ class Jobs {
             return null;
         }
 
-        return $result->fetchAllAssociative();
+        $data = [];
+
+        while ($row = $result->fetchAssociative()) {
+            $row['isFirmware'] = $this->firmwares->exists($row['jobId']);
+            array_push($data, $row);
+        }
+
+        return $data;
     }
 }

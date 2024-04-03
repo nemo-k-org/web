@@ -3,7 +3,6 @@ import CryptoJS from 'crypto-js'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
 import { Terminal } from 'xterm'
 
-import * as m from './lib/MQuery'
 import { arrayBufferToString } from './lib/arrayBufferHelper'
 
 class FirmwareUploader {
@@ -21,7 +20,6 @@ class FirmwareUploader {
 
     window.addEventListener('load', () => {
       this.activateTerminal()
-      this.activateButtons()
     })
   }
 
@@ -31,17 +29,23 @@ class FirmwareUploader {
     this.serialTerminal.open(elTerminal)
   }
 
-  activateButtons = () => {
-    m.OnClick('#buttonFlash', async (event: Event) => {
-      event.preventDefault()
-      await this.serialConnect()
-      await this.downloadFirmwareFromBackend()
-      await this.uploadFirmwareToMicrocontroller()
-      await this.serialDisconnect()
-    })
+  uploadFirmware = async (customerCode: string, jobId: string): Promise<boolean> => {
+    if (!await this.serialConnect()) {
+      return false
+    }
+
+    if (!await this.downloadFirmwareFromBackend(customerCode, jobId)) {
+      return false
+    }
+
+    if (!await this.uploadFirmwareToMicrocontroller()) {
+      return false
+    }
+
+    await this.serialDisconnect()
   }
 
-  serialConnect = async () => {
+  serialConnect = async (): Promise<boolean> => {
     if (this.serialDevice === null) {
       try {
         // @ts-ignore
@@ -49,10 +53,11 @@ class FirmwareUploader {
       } catch (e) {
         console.error(e)
         this.serialTerminal.writeln(`Error while selecting serial port: ${e.message}`)
-        return
+        return false
       }
 
       this.serialTransport = new Transport(this.serialDevice, true)
+      return true
     }
 
     this.connectedChip = ''
@@ -88,10 +93,7 @@ class FirmwareUploader {
     this.serialDevice = null
   }
 
-  downloadFirmwareFromBackend = async () => {
-    const jobId = m.GetFormInputValue('#tabFlashJobId')
-    const customerCode = m.GetFormInputValue('#customerCode')
-
+  downloadFirmwareFromBackend = async (customerCode: string, jobId: string): Promise<boolean> => {
     try {
       const response = await axios.get(`/api/jobs/${jobId}/firmware`, {
         responseType: 'arraybuffer',
@@ -104,10 +106,13 @@ class FirmwareUploader {
     } catch (e) {
       console.error(e)
       this.serialTerminal.writeln(`Error while downloading firmware: ${e.message}`)
+      return false
     }
+
+    return true
   }
 
-  uploadFirmwareToMicrocontroller = async () => {
+  uploadFirmwareToMicrocontroller = async (): Promise<boolean> => {
     const flashOptionsFileArray = [
       {
         data: arrayBufferToString(this.firmwareImage),
@@ -130,7 +135,10 @@ class FirmwareUploader {
     } catch (e) {
       console.error(e)
       this.serialTerminal.writeln(`Error: ${e.message}`)
+      return false
     }
+
+    return true
   }
 }
 

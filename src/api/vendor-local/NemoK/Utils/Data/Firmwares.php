@@ -74,6 +74,11 @@ class Firmwares {
         return fopen('file://'.$firmwareFilename, 'r');
     }
 
+    function exists($jobId) {
+        $firmwareFilename = $this->getFirmwareFilename($jobId);
+        return is_file($firmwareFilename);
+    }
+
     private function isProperFirmwareZip($uploadedFile) {
         $zip = new \ZipArchive();
         $result = $zip->open($uploadedFile, \ZipArchive::RDONLY);
