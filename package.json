@@ -17,6 +17,7 @@
     "mysql2": "^3.9.2",
     "playwright": "^1.42.1",
     "simple-datatables": "^9.0.0",
+    "timesago": "^1.0.1",
     "ts-loader": "^9.5.1",
     "uuid": "^9.0.1",
     "webpack": "^5.90.3",

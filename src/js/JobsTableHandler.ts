@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { DataTable } from 'simple-datatables'
+import timesago from 'timesago'
 
 import * as m from './lib/MQuery'
 import FirmwareUploader from './FirmwareUploader'
@@ -18,7 +19,7 @@ class JobsTableHandler {
     this.selectorCustomerCode = selectorCustomerCode
     this.selectorJobsTable = selectorJobsTable
 
-    this.jobsTableColumnHeadings = ['isFirmware', 'status', 'updatedSecsAgo', 'parameters', 'jobId']
+    this.jobsTableColumnHeadings = ['isFirmware', 'status', 'updatedSecsAgo', 'parameters', 'jobId', 'updatedSecsAgo']
 
     window.addEventListener('load', () => {
       this.activateTable()
@@ -34,6 +35,10 @@ class JobsTableHandler {
     return ' '
   }
 
+  cellRenderUpdateSecsAgo = (data: any, cell: object, dataIndex: number, cellIndex: number): string => {
+    return timesago(Date.now() - (data[0].data * 1000))
+  }
+
   cellRenderJobId = (data: any, cell: object, dataIndex: number, cellIndex: number): string => {
     const jobId = data[0].data
     return `<a href="#" data-bs-toggle="tooltip" data-bs-title="${jobId}" class="jobsTableLinkJobId">jobId</a>`
@@ -44,29 +49,30 @@ class JobsTableHandler {
     this.jobsTable = new DataTable(elementJobsTable, {
       searchable: false,
       paging: false,
+      sortable: false,
       columns: [
         {
           select: 0,
-          sortable: false,
           render: this.cellRenderIsFirmware
         },
         {
-          select: 1,
-          sortable: true
+          select: 1
         },
         {
           select: 2,
-          sortable: true,
-          sort: 'asc'
+          render: this.cellRenderUpdateSecsAgo
         },
         {
-          select: 3,
-          sortable: true
+          select: 3
         },
         {
           select: 4,
-          sortable: false,
           render: this.cellRenderJobId
+        },
+        {
+          select: 5,
+          sort: 'asc',
+          hidden: true
         }
       ]
     })
