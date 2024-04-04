@@ -11,14 +11,30 @@
         <h1>Nemo-K Flash Tool</h1>
 
         <form>
-            <h2>Enter your customer code</h2>
+            <button type="button" class="btn" id="buttonOpenModalUserAccountDialog"></button>
 
-            <div class="form-group">
-                <label for="customerCode">Your customer code given to you by Nemo-K admins</label>
-                <input type="text" class="form-control" id="customerCode" aria-describedby="customerCodeHelp">
-                <small id="customerCodeHelp" class="form-text text-muted">
-                    At the moment we don't give new customer codes.
-                </small>
+            <div id="modalUserAccountDialog" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Enter Your Customer Code</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="customerCode">Please enter your customer code given to you by Nemo-K admins</label>
+                                <input type="text" class="form-control" id="customerCode" aria-describedby="customerCodeHelp">
+                                <small id="customerCodeHelp" class="form-text text-muted">
+                                    At the moment we don't give new customer codes.
+                                </small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="buttonUseCustomerCode">Continue</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <h2>Your programs</h2>

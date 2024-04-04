@@ -9,12 +9,15 @@ interface SensorParametersTest {
 }
 
 class JobSubmitter {
+  functionCustomerCode: Function
   selectedSensor: string
   submittedJobId: string
   jobStatusPollingHandle: number
   jobStatusPollingInterval = 10000
 
-  constructor () {
+  constructor (functionCustomerCode: Function) {
+    this.functionCustomerCode = functionCustomerCode
+
     window.addEventListener('load', () => {
       this.activateButtons()
       this.selectedSensor = 'none'
@@ -74,7 +77,7 @@ class JobSubmitter {
     try {
       const response = await axios.post('/api/jobs', {
         jobParameters: jobParameters,
-        customerCode: m.GetFormInputValue('#customerCode')
+        customerCode: this.functionCustomerCode()
       })
 
       m.SetText('#submitJobStatus', `Job submitted, id: ${response.data}, please wait...`)
@@ -106,7 +109,7 @@ class JobSubmitter {
     try {
       const response = await axios.get(`/api/jobs/${this.submittedJobId}/status`, {
         headers: {
-          'NemoK-CustomerCode': m.GetFormInputValue('#customerCode')
+          'NemoK-CustomerCode': this.functionCustomerCode()
         }
       })
 

@@ -6,8 +6,7 @@ import * as m from './lib/MQuery'
 import FirmwareUploader from './FirmwareUploader'
 
 class JobsTableHandler {
-  selectorCustomerCode: string
-  customerCode: string
+  functionCustomerCode: Function
   jobStatusPollingHandle: number
   jobStatusPollingInterval = 3000
   selectorJobsTable: string
@@ -15,9 +14,9 @@ class JobsTableHandler {
   jobsTableColumnHeadings: string[]
   firmwareUploader: FirmwareUploader
 
-  constructor (selectorCustomerCode: string, selectorJobsTable: string) {
-    this.selectorCustomerCode = selectorCustomerCode
+  constructor (selectorJobsTable: string, functionCustomerCode: Function) {
     this.selectorJobsTable = selectorJobsTable
+    this.functionCustomerCode = functionCustomerCode
 
     this.jobsTableColumnHeadings = ['isFirmware', 'status', 'updatedSecsAgo', 'parameters', 'jobId', 'updatedSecsAgo']
 
@@ -79,10 +78,7 @@ class JobsTableHandler {
   }
 
   activateEvents = () => {
-    m.OnEvent(this.selectorCustomerCode, 'keyup', () => {
-      this.customerCode = m.GetFormInputValue(this.selectorCustomerCode)
-      this.startCountdownForNextJobStatusUpdate()
-    })
+    this.startCountdownForNextJobStatusUpdate()
 
     m.OnClick('.jobsTableLinkJobId', this.eventClickedJobsTableLinkJobId)
 
@@ -94,7 +90,7 @@ class JobsTableHandler {
 
       console.debug(jobId)
 
-      const firmwareUploaded = await this.firmwareUploader.uploadFirmware(this.customerCode, jobId)
+      const firmwareUploaded = await this.firmwareUploader.uploadFirmware(this.functionCustomerCode(), jobId)
       if (firmwareUploaded) {
         alert('Program uploaded successfully.')
       } else {
@@ -143,25 +139,32 @@ class JobsTableHandler {
     this.jobsTable.data.data = []
     this.jobsTable.insert({ data: newData.map((item: any) => this.jobsTableRowValues(item)) })
     m.EnableTooltips()
+
+    this.jobsTable.update()
   }
 
   doJobStatusPolling = async () => {
+    const customerCode = this.functionCustomerCode()
+
+    if (!customerCode) {
+      this.startCountdownForNextJobStatusUpdate()
+      return
+    }
+
     try {
       const response = await axios.get('/api/customer/jobs', {
         headers: {
-          'NemoK-CustomerCode': this.customerCode
+          'NemoK-CustomerCode': customerCode
         }
       })
 
       this.jobsTableReplaceData(response.data)
-
-      this.startCountdownForNextJobStatusUpdate()
     } catch (error) {
-      console.error(`Error while getting job status for customerCode ${this.customerCode}`, error)
-      return
+      console.error(`Error while getting job status for customerCode ${customerCode}`, error)
+      this.jobsTableReplaceData([])
     }
 
-    this.jobsTable.update()
+    this.startCountdownForNextJobStatusUpdate()
   }
 }
 

@@ -2,9 +2,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import JobSubmitter from './JobSubmitter'
 import FirmwareUploader from './FirmwareUploader'
+import UserAccount from './UserAccount'
 import JobsTableHandler from './JobsTableHandler'
 
-const jobSubmitter = new JobSubmitter() // eslint-disable-line no-unused-vars
 const firmwareUploader = new FirmwareUploader()
 
 const espLoaderTerminal = {
@@ -20,5 +20,7 @@ const espLoaderTerminal = {
 }
 firmwareUploader.espLoaderTerminal = espLoaderTerminal
 
-const jobsTableHandler = new JobsTableHandler('#customerCode', '#tableJobs')
+const userAccount = new UserAccount()
+const jobSubmitter = new JobSubmitter(userAccount.getCustomerCode) // eslint-disable-line no-unused-vars
+const jobsTableHandler = new JobsTableHandler('#tableJobs', userAccount.getCustomerCode)
 jobsTableHandler.firmwareUploader = firmwareUploader
