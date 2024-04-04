@@ -33,43 +33,61 @@
                 </thead>
             </table>
 
-            <h2>Create a new program</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateProgramDialog">
+                Create a New Program
+            </button>
+              
+            <div id="modalCreateProgramDialog" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create a New Program</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Start by creating a program for your microcontroller. Choose the sensor
+                                type and select the options below.
+                            </p>
+                            <p>Select sensor type:</p>
+                            <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
+                            <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
+                
+                            <div id="sensorParameterAreaNone" class="sensorParameterArea">
+                                <p>Please select sensor type.</p>
+                            </div>
+                
+                            <div id="sensorParameterAreaTest" class="sensorParameterArea">
+                                <div class="form-group">
+                                    <label for="sensorParameterTestSsid">Your WiFi SSID</label>
+                                    <input type="text" class="form-control" id="sensorParameterTestSsid" aria-describedby="sensorParameterTestSsidHelp">
+                                    <small id="sensorParameterTestSsidHelp" class="form-text text-muted">
+                                        The network name of your yacht for sensor to connect.
+                                        Valid characters are a-z, A-Z, 0-9, - and _.
+                                    </small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sensorParameterTestPassword">Your WiFi password</label>
+                                    <input type="text" class="form-control" id="sensorParameterTestPassword" aria-describedby="sensorParameterTestPasswordHelp">
+                                    <small id="sensorParameterTestPasswordHelp" class="form-text text-muted">
+                                        The network password of your yacht for sensor to connect
+                                        Valid characters are a-z, A-Z, 0-9, - and _.
+                                    </small>
+                                </div>
+                            </div>
 
-            <p>
-                Start by creating a program for your microcontroller. Choose the sensor
-                type and select the options below. After a successful job submission you
-                get a Job ID which you need to upload the program to microcontroller.
-            </p>
-            <p>Select sensor type:</p>
-            <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
-            <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
-
-            <div id="sensorParameterAreaNone" class="sensorParameterArea">
-                <p>Please select sensor type.</p>
-            </div>
-
-            <div id="sensorParameterAreaTest" class="sensorParameterArea">
-                <div class="form-group">
-                    <label for="sensorParameterTestSsid">Your WiFi SSID</label>
-                    <input type="text" class="form-control" id="sensorParameterTestSsid" aria-describedby="sensorParameterTestSsidHelp">
-                    <small id="sensorParameterTestSsidHelp" class="form-text text-muted">
-                        The network name of your yacht for sensor to connect.
-                        Valid characters are a-z, A-Z, 0-9, - and _.
-                    </small>
+                            <div id="sensorParameterAreaStatus" class="sensorParameterArea">
+                                <p>Job status:</p>
+                                <div id="submitJobStatus"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="buttonSubmitJob">Create Program</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="sensorParameterTestPassword">Your WiFi password</label>
-                    <input type="text" class="form-control" id="sensorParameterTestPassword" aria-describedby="sensorParameterTestPasswordHelp">
-                    <small id="sensorParameterTestPasswordHelp" class="form-text text-muted">
-                        The network password of your yacht for sensor to connect
-                        Valid characters are a-z, A-Z, 0-9, - and _.
-                    </small>
-                </div>
             </div>
-
-            <button id="submitJob" type="button" class="btn btn-primary">Submit job</button>
-
-            <div id="submitJobStatus"></div>
 
             <h2>Debug Terminal</h2>
     

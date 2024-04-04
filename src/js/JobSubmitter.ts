@@ -18,37 +18,41 @@ class JobSubmitter {
     window.addEventListener('load', () => {
       this.activateButtons()
       this.selectedSensor = 'none'
-      this.activateSensorParameterArea('#buttonSelectSensorNone', '#sensorParameterAreaNone')
+      this.activateSensorParameterArea('#sensorParameterAreaNone', '#buttonSelectSensorNone')
     })
   }
 
   activateButtons = () => {
     m.OnClick('#buttonSelectSensorNone', () => {
-      this.activateSensorParameterArea('#buttonSelectSensorNone', '#sensorParameterAreaNone')
+      this.activateSensorParameterArea('#sensorParameterAreaNone', '#buttonSelectSensorNone')
       this.selectedSensor = 'none'
+      m.SetText('#submitJobStatus', '')
     })
 
     m.OnClick('#buttonSelectSensorTest', () => {
-      this.activateSensorParameterArea('#buttonSelectSensorTest', '#sensorParameterAreaTest')
+      this.activateSensorParameterArea('#sensorParameterAreaTest', '#buttonSelectSensorTest')
       this.selectedSensor = 'test'
+      m.SetText('#submitJobStatus', '')
     })
 
-    m.OnClick('#submitJob', () => {
+    m.OnClick('#buttonSubmitJob', () => {
+      m.SetText('#submitJobStatus', '')
+      this.activateSensorParameterArea('#sensorParameterAreaStatus')
       this.submitJob()
     })
   }
 
-  activateSensorParameterArea = (buttonSelector: string, areaSelector: string) => {
+  activateSensorParameterArea = (areaSelector: string, buttonSelector?: string) => {
     m.Hide('.sensorParameterArea')
     m.Show(areaSelector)
 
-    m.RemoveClass('.buttonSelectSensor', 'btn-primary')
-    m.RemoveClass('.buttonSelectSensor', 'btn-secondary')
-    m.AddClass('.buttonSelectSensor', 'btn-secondary')
-    m.RemoveClass(buttonSelector, 'btn-secondary')
-    m.AddClass(buttonSelector, 'btn-primary')
-
-    m.SetText('#submitJobStatus', '')
+    if (buttonSelector) {
+      m.RemoveClass('.buttonSelectSensor', 'btn-primary')
+      m.RemoveClass('.buttonSelectSensor', 'btn-secondary')
+      m.AddClass('.buttonSelectSensor', 'btn-secondary')
+      m.RemoveClass(buttonSelector, 'btn-secondary')
+      m.AddClass(buttonSelector, 'btn-primary')
+    }
   }
 
   getSensorParameters = (): SensorParametersTest|null => {
@@ -109,10 +113,7 @@ class JobSubmitter {
       const jobStatus = response.data
 
       if (jobStatus === 'submitted') {
-        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service, please wait...`)
-      } else if (jobStatus === 'received') {
-        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} is ready to be uploaded to your microcontroller.`)
-        m.SetFormInputValue('#tabFlashJobId', this.submittedJobId)
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service. You can close this dialog.`)
       } else {
         m.SetText('#submitJobStatus', `Job ${this.submittedJobId} status: "${jobStatus}"`)
       }
