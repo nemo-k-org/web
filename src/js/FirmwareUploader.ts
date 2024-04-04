@@ -31,18 +31,26 @@ class FirmwareUploader {
 
   uploadFirmware = async (customerCode: string, jobId: string): Promise<boolean> => {
     if (!await this.serialConnect()) {
+      this.serialTerminal.writeln('Firmware upload failed: could not open serial connection')
+      await this.serialDisconnect()
       return false
     }
 
     if (!await this.downloadFirmwareFromBackend(customerCode, jobId)) {
+      this.serialTerminal.writeln('Firmware upload failed: could not download firmware from backend')
+      await this.serialDisconnect()
       return false
     }
 
     if (!await this.uploadFirmwareToMicrocontroller()) {
+      this.serialTerminal.writeln('Firmware upload failed: could not upload firmware to microcontroller')
+      await this.serialDisconnect()
       return false
     }
 
     await this.serialDisconnect()
+
+    return true
   }
 
   serialConnect = async (): Promise<boolean> => {
@@ -57,7 +65,6 @@ class FirmwareUploader {
       }
 
       this.serialTransport = new Transport(this.serialDevice, true)
-      return true
     }
 
     this.connectedChip = ''
@@ -79,18 +86,25 @@ class FirmwareUploader {
     } catch (e) {
       console.error(e)
       this.serialTerminal.writeln(`Error: ${e.message}`)
+      return false
     }
+
+    return true
   }
 
   serialDisconnect = async () => {
     if (this.serialTransport) {
-      await this.serialTransport.disconnect()
+      try {
+        await this.serialTransport.disconnect()
+        this.serialTerminal.writeln('Device disconnected successfully')
+      } catch (e) {
+        console.error(`Error while closing serial port: ${e.message}`)
+      }
     }
-
-    this.serialTerminal.writeln('Device disconnected successfully')
 
     this.connectedChip = ''
     this.serialDevice = null
+    this.serialTransport = null
   }
 
   downloadFirmwareFromBackend = async (customerCode: string, jobId: string): Promise<boolean> => {
@@ -108,6 +122,8 @@ class FirmwareUploader {
       this.serialTerminal.writeln(`Error while downloading firmware: ${e.message}`)
       return false
     }
+
+    console.debug('firmware is loaded', customerCode, jobId, this.firmwareImage.byteLength)
 
     return true
   }

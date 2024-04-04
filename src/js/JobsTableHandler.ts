@@ -89,8 +89,10 @@ class JobsTableHandler {
       console.debug(jobId)
 
       const firmwareUploaded = await this.firmwareUploader.uploadFirmware(this.customerCode, jobId)
-      if (!firmwareUploaded) {
-        alert('Could not upload firmware for whatnot reason')
+      if (firmwareUploaded) {
+        alert('Program uploaded successfully.')
+      } else {
+        alert('Could not upload firmware. See terminal for detailed error messages.')
       }
     })
   }
