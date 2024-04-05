@@ -67,3 +67,7 @@ stop:
 test: stop start-test
 	npx playwright test --config=test/playwright.api.config.ts
 	if [ -f apache/httpd.pid ]; then kill -TERM `cat apache/httpd.pid`; fi
+
+.PHONY: publish
+publish:
+	./publish.sh nemok.org /home/qogmdthz/ nemok.org
