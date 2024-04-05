@@ -49,7 +49,9 @@ const jobIdsToResponseArray = (jobIds: string[], status: JobStatus): any => {
         response.push({
             jobId: jobId,
             parameters: JSON.stringify({'TEST_CASE': '1'}),
-            status: status
+            status: status,
+            updatedSecsAgo: 0,
+            isFirmware: false
         })
     })
 
@@ -77,6 +79,11 @@ test('jobs listing works all right', async ({ request }) => {
     expect(jobsInitial).toBeTruthy()
     expect(jobsInitial.length).toBe(jobIds.length)
 
+    for (let n=0; n < jobsInitial.length; n++) {
+        expect(jobsInitial[n].updatedSecsAgo).toBeLessThan(5)
+        jobsInitial[n].updatedSecsAgo = 0
+    }
+
     jobIdsToResponseArray(jobIds, 'created').forEach((jobId: any) => {
         expect(jobsInitial).toEqual(expect.arrayContaining([jobId]))
     })
@@ -100,10 +107,16 @@ test('jobs listing works all right', async ({ request }) => {
     expect(jobsAfterFirmwareUpload).toBeTruthy()
     expect(jobsAfterFirmwareUpload.length).toBe(jobIds.length)
 
+    for (let n=0; n < jobsAfterFirmwareUpload.length; n++) {
+        expect(jobsAfterFirmwareUpload[n].updatedSecsAgo).toBeLessThan(5)
+        jobsAfterFirmwareUpload[n].updatedSecsAgo = 0
+    }
+
     let jobs = jobIdsToResponseArray(jobIds, 'created')
     for (let n=0; n < jobs.length; n++ ) {
         if (n == 1) {
             jobs[n].status = 'received'
+            jobs[n].isFirmware = true
         }
 
         expect(jobsAfterFirmwareUpload).toEqual(expect.arrayContaining([jobs[n]]))
