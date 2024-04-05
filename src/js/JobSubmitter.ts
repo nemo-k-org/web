@@ -91,21 +91,10 @@ class JobSubmitter {
         } else {
           m.SetText('#submitJobStatus', 'Failed to submit job. Check job parameters. You may find more information in the browser console.')
         }
-      })
-
-      const jobStatus = response.data
-
-      if (jobStatus === 'submitted') {
-        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service. You can close this dialog.`)
       } else {
-        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} status: "${jobStatus}"`)
+        m.SetText('#submitJobStatus', 'Failed to submit job. See browser console for details.')
       }
-    } catch (error) {
-      console.error(error)
-      m.SetText('#submitJobStatus', 'Error when querying job status. See browser log for details.')
     }
-
-    this.pollJobStatusAfterTimeout()
   }
 
   pollJobStatusAfterTimeout = () => {

@@ -33,16 +33,6 @@ class Jobs {
         return ($jobData['customerId'] === $customerId);
     }
 
-    private function customerOwnsJob($customerId, $jobId) {
-        $jobData = $this->jobs->get($jobId);
-
-        if (is_null($jobData)) {
-            return null;
-        }
-
-        return ($jobData['customerId'] === $customerId);
-    }
-
     function add($customerId, $jobParameters, $userAgent, $remoteAddress) {
         $uuidGenerator = new Utils\Uuid();
         $jobId = $uuidGenerator->getUuidV4();
@@ -169,28 +159,6 @@ class Jobs {
         }
 
         $firmwareStream = $this->firmwares->get($jobIdSafe);
-
-        if (is_null($firmwareStream)) {
-            return [null, Utils\Http::STATUS_CODE_ERROR_FIRMWARE_FILE_MISSING];
-        }
-
-        return [$firmwareStream, Utils\Http::STATUS_CODE_OK];
-    }
-
-    function getFirmware($customerId, $jobId) {
-        $customerOwnsJob = $this->customerOwnsJob($customerId, $jobId);
-
-        if (is_null($customerOwnsJob)) {
-            $this->logger->debug('Given jobId does not exist', [$jobId]);
-            return [null, Utils\Http::STATUS_CODE_NOT_FOUND];
-        }
-
-        if (! $customerOwnsJob) {
-            $this->logger->debug('Authorised customerId and customerId of the given job do not match', [$customerId, $jobId]);
-            return [null, Utils\Http::STATUS_CODE_UNAUTHORIZED];
-        }
-
-        $firmwareStream = $this->firmwares->get($jobId);
 
         if (is_null($firmwareStream)) {
             return [null, Utils\Http::STATUS_CODE_ERROR_FIRMWARE_FILE_MISSING];
