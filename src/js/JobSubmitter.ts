@@ -91,10 +91,21 @@ class JobSubmitter {
         } else {
           m.SetText('#submitJobStatus', 'Failed to submit job. Check job parameters. You may find more information in the browser console.')
         }
+      })
+
+      const jobStatus = response.data
+
+      if (jobStatus === 'submitted') {
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service. You can close this dialog.`)
       } else {
-        m.SetText('#submitJobStatus', 'Failed to submit job. See browser console for details.')
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} status: "${jobStatus}"`)
       }
+    } catch (error) {
+      console.error(error)
+      m.SetText('#submitJobStatus', 'Error when querying job status. See browser log for details.')
     }
+
+    this.pollJobStatusAfterTimeout()
   }
 
   pollJobStatusAfterTimeout = () => {
@@ -109,14 +120,17 @@ class JobSubmitter {
     try {
       const response = await axios.get(`/api/jobs/${this.submittedJobId}/status`, {
         headers: {
-          'NemoK-CustomerCode': this.functionCustomerCode()
+          'NemoK-CustomerCode': m.GetFormInputValue('#customerCode')
         }
       })
 
       const jobStatus = response.data
 
       if (jobStatus === 'submitted') {
-        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service. You can close this dialog.`)
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} has been submitted to compilation service, please wait...`)
+      } else if (jobStatus === 'received') {
+        m.SetText('#submitJobStatus', `Job ${this.submittedJobId} is ready to be uploaded to your microcontroller.`)
+        m.SetFormInputValue('#tabFlashJobId', this.submittedJobId)
       } else {
         m.SetText('#submitJobStatus', `Job ${this.submittedJobId} status: "${jobStatus}"`)
       }
