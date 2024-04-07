@@ -88,8 +88,6 @@ class JobsTableHandler {
       const elJobIdLink = elRow.querySelector('[data-bs-title]')
       const jobId = elJobIdLink.getAttribute('data-bs-title')
 
-      console.debug(jobId)
-
       const firmwareUploaded = await this.firmwareUploader.uploadFirmware(this.functionCustomerCode(), jobId)
       if (firmwareUploaded) {
         alert('Program uploaded successfully.')
