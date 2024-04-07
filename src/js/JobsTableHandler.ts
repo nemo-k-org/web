@@ -3,7 +3,7 @@ import { DataTable } from 'simple-datatables'
 import timesago from 'timesago'
 
 import * as m from './lib/MQuery'
-import FirmwareUploader from './FirmwareUploader'
+import FirmwareUploader from './Component/FirmwareUploader'
 
 class JobsTableHandler {
   functionCustomerCode: Function
@@ -90,9 +90,9 @@ class JobsTableHandler {
 
       const firmwareUploaded = await this.firmwareUploader.uploadFirmware(this.functionCustomerCode(), jobId)
       if (firmwareUploaded) {
-        alert('Program uploaded successfully.')
+        this.firmwareUploader.espLoaderTerminal.writeLine('Program uploaded successfully. You may now disconnect your microcontroller from your computer.')
       } else {
-        alert('Could not upload firmware. See terminal for detailed error messages.')
+        this.firmwareUploader.espLoaderTerminal.writeLine('An error was encountered while uploading the program. See terminal for detailed error messages.')
       }
     })
   }

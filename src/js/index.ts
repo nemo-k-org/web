@@ -1,26 +1,29 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { IEspLoaderTerminal } from 'esptool-js'
 
+import MainUI from './MainUI'
 import JobSubmitter from './JobSubmitter'
-import FirmwareUploader from './FirmwareUploader'
 import UserAccount from './UserAccount'
 import JobsTableHandler from './JobsTableHandler'
 
-const firmwareUploader = new FirmwareUploader()
+const mainUI = new MainUI()
 
-const espLoaderTerminal = {
+const espLoaderTerminal: IEspLoaderTerminal = {
   clean () {
-    firmwareUploader.serialTerminal.clear()
+    mainUI.firmwareUploader.serialTerminal.clear()
   },
   writeLine (data: string) {
-    firmwareUploader.serialTerminal.writeln(data)
+    mainUI.firmwareUploader.serialTerminal.writeln(data)
+    mainUI.firmwareUploadMessage(data)
   },
   write (data: string) {
-    firmwareUploader.serialTerminal.write(data)
+    mainUI.firmwareUploader.serialTerminal.write(data)
+    mainUI.firmwareUploadMessage(data)
   }
 }
-firmwareUploader.espLoaderTerminal = espLoaderTerminal
+mainUI.firmwareUploader.espLoaderTerminal = espLoaderTerminal
 
 const userAccount = new UserAccount()
 const jobSubmitter = new JobSubmitter(userAccount.getCustomerCode) // eslint-disable-line no-unused-vars
 const jobsTableHandler = new JobsTableHandler('#tableJobs', userAccount.getCustomerCode)
-jobsTableHandler.firmwareUploader = firmwareUploader
+jobsTableHandler.firmwareUploader = mainUI.firmwareUploader

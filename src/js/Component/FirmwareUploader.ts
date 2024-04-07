@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
 import { Terminal } from 'xterm'
 
-import { arrayBufferToString } from './lib/arrayBufferHelper'
+import { arrayBufferToString } from '../lib/arrayBufferHelper'
 
 class FirmwareUploader {
   serialTerminal: Terminal
