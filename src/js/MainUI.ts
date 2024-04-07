@@ -30,7 +30,26 @@ class MainUI {
     }
   }
 
+  firmwareUploadProgress = (percentage: number) => {
+    const idContainer = 'messageUploadFirmwareProgressContainer'
+    const idProgbar = 'messageUploadFirmwareProgressBar'
+
+    document.getElementById(idContainer).setAttribute('aria-valuenow', `${percentage}`)
+    document.getElementById(idProgbar).style.width = `${percentage}%`
+
+    if (percentage < 100) {
+      m.RemoveClass(`#${idProgbar}`, 'bg-success')
+    } else {
+      m.AddClass(`#${idProgbar}`, 'bg-success')
+    }
+  }
+
   firmwareUploadMessage = (data: string) => {
+    const match = data.match(/^Writing.+\((\d+)%\)/)
+    if (match) {
+      this.firmwareUploadProgress(Number(match[1]))
+    }
+
     m.ModalShow('#modalUploadFirmwareProgressDialog')
     m.SetText('#messageUploadFirmwareProgress', data)
   }

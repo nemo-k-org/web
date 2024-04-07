@@ -11,6 +11,7 @@ const mainUI = new MainUI()
 const espLoaderTerminal: IEspLoaderTerminal = {
   clean () {
     mainUI.firmwareUploader.serialTerminal.clear()
+    mainUI.firmwareUploadProgress(0)
   },
   writeLine (data: string) {
     mainUI.firmwareUploader.serialTerminal.writeln(data)
