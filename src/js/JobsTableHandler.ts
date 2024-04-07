@@ -78,7 +78,7 @@ class JobsTableHandler {
   }
 
   activateEvents = () => {
-    this.startCountdownForNextJobStatusUpdate()
+    this.doJobStatusPolling()
 
     m.OnClick('.jobsTableLinkJobId', this.eventClickedJobsTableLinkJobId)
 
