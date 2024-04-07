@@ -13,7 +13,7 @@ class UserAccount {
         this.customerCode = oldCustomerCode
       }
 
-      this.updateModalButtonText()
+      this.updateUIBasedOnAuthenticaton()
     })
   }
 
@@ -27,22 +27,31 @@ class UserAccount {
       localStorage.setItem('customerCode', newCustomerCode)
       this.customerCode = newCustomerCode
 
-      this.updateModalButtonText()
+      this.updateUIBasedOnAuthenticaton()
       m.ModalHide('#modalUserAccountDialog')
     })
   }
 
-  updateModalButtonText = () => {
-    const btnSelector = '#buttonOpenModalUserAccountDialog'
+  updateUIBasedOnAuthenticaton = () => {
+    const btnUserAccountDialog = '#buttonOpenModalUserAccountDialog'
+    const btnCreateNewProgram = '#buttonOpenModalCreateProgramDialog'
 
     if (this.customerCode) {
-      m.SetText(btnSelector, 'Update your Customer Code')
-      m.RemoveClass(btnSelector, 'btn-success')
-      m.AddClass(btnSelector, 'btn-secondary')
+      m.SetText(btnUserAccountDialog, 'Update your Customer Code')
+      m.RemoveClass(btnUserAccountDialog, 'btn-success')
+      m.AddClass(btnUserAccountDialog, 'btn-secondary')
+
+      m.RemoveClass(btnCreateNewProgram, 'btn-secondary')
+      m.AddClass(btnCreateNewProgram, 'btn-success')
+      m.FormInputEnable(btnCreateNewProgram)
     } else {
-      m.SetText(btnSelector, 'Enter your Customer Code')
-      m.RemoveClass(btnSelector, 'btn-secondary')
-      m.AddClass(btnSelector, 'btn-success')
+      m.SetText(btnUserAccountDialog, 'Enter your Customer Code')
+      m.RemoveClass(btnUserAccountDialog, 'btn-secondary')
+      m.AddClass(btnUserAccountDialog, 'btn-success')
+
+      m.RemoveClass(btnCreateNewProgram, 'btn-success')
+      m.AddClass(btnCreateNewProgram, 'btn-secondary')
+      m.FormInputDisable(btnCreateNewProgram)
     }
   }
 
