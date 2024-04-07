@@ -1,3 +1,13 @@
 body {
     margin: 1em;
 }
+
+.warning {
+    background-color: red;
+    color: white;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    display: none;
+}
+
+.warning > p:last-child { margin-bottom: 0; }

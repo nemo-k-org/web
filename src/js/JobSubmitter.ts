@@ -22,6 +22,7 @@ class JobSubmitter {
       this.activateButtons()
       this.selectedSensor = 'none'
       this.activateSensorParameterArea('#sensorParameterAreaNone', '#buttonSelectSensorNone')
+      this.activateBrowserWarning()
     })
   }
 
@@ -55,6 +56,14 @@ class JobSubmitter {
       m.AddClass('.buttonSelectSensor', 'btn-secondary')
       m.RemoveClass(buttonSelector, 'btn-secondary')
       m.AddClass(buttonSelector, 'btn-primary')
+    }
+  }
+
+  activateBrowserWarning = () => {
+    if (this.browserHasSerial()) {
+      m.Hide('#browserWarningSerialSupport')
+    } else {
+      m.Show('#browserWarningSerialSupport')
     }
   }
 
@@ -129,6 +138,10 @@ class JobSubmitter {
     }
 
     this.pollJobStatusAfterTimeout()
+  }
+
+  browserHasSerial = ():boolean => {
+    return 'serial' in window.navigator
   }
 }
 
