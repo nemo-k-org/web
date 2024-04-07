@@ -145,6 +145,7 @@ class JobsTableHandler {
     const customerCode = this.functionCustomerCode()
 
     if (!customerCode) {
+      this.jobsTableReplaceData([])
       this.startCountdownForNextJobStatusUpdate()
       return
     }
