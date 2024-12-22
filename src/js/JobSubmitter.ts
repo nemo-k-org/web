@@ -8,6 +8,26 @@ interface SensorParametersTest {
   nemok_wifi_pass: string;
 }
 
+interface SensorParametersDS18B20 {
+  nemok_sensor_temp_ds18b20: number,
+  nemok_sensor_hostname: string;
+  nemok_sensor_delay: number;
+  nemok_wifi_ssid: string;
+  nemok_wifi_pass: string;
+  nemok_signalk_server_host: string;
+  nemok_signalk_server_port: number;
+}
+
+interface SensorParametersMAX6675 {
+  nemok_sensor_temp_max6675: number,
+  nemok_sensor_hostname: string;
+  nemok_sensor_delay: number;
+  nemok_wifi_ssid: string;
+  nemok_wifi_pass: string;
+  nemok_signalk_server_host: string;
+  nemok_signalk_server_port: number;
+}
+
 class JobSubmitter {
   functionCustomerCode: Function
   selectedSensor: string
@@ -21,34 +41,50 @@ class JobSubmitter {
     window.addEventListener('load', () => {
       this.activateButtons()
       this.selectedSensor = 'none'
-      this.activateSensorParameterArea('#sensorParameterAreaNone', '#buttonSelectSensorNone')
+      this.activateSensorParameterFields('.sensorParameterNone', '#buttonSelectSensorNone')
       this.activateBrowserWarning()
     })
   }
 
   activateButtons = () => {
     m.OnClick('#buttonSelectSensorNone', () => {
-      this.activateSensorParameterArea('#sensorParameterAreaNone', '#buttonSelectSensorNone')
+      this.activateSensorParameterFields('.sensorParameterNone', '#buttonSelectSensorNone')
       this.selectedSensor = 'none'
       m.SetText('#submitJobStatus', '')
     })
 
     m.OnClick('#buttonSelectSensorTest', () => {
-      this.activateSensorParameterArea('#sensorParameterAreaTest', '#buttonSelectSensorTest')
+      this.activateSensorParameterFields('.sensorParameterTest', '#buttonSelectSensorTest')
       this.selectedSensor = 'test'
+      m.SetText('#submitJobStatus', '')
+    })
+
+    m.OnClick('#buttonSelectSensorDS18B20', () => {
+      this.activateSensorParameterFields('.sensorParameterDS18B20', '#buttonSelectSensorDS18B20')
+      this.selectedSensor = 'ds18b20'
+      m.SetText('#submitJobStatus', '')
+    })
+
+    m.OnClick('#buttonSelectSensorMAX6675', () => {
+      this.activateSensorParameterFields('.sensorParameterMAX6675', '#buttonSelectSensorMAX6675')
+      this.selectedSensor = 'max6675'
       m.SetText('#submitJobStatus', '')
     })
 
     m.OnClick('#buttonSubmitJob', () => {
       m.SetText('#submitJobStatus', '')
-      this.activateSensorParameterArea('#sensorParameterAreaStatus')
+      m.Hide('#sensorParameterArea')
+      m.Show('#sensorStatusArea')
+
       this.submitJob()
     })
   }
 
-  activateSensorParameterArea = (areaSelector: string, buttonSelector?: string) => {
-    m.Hide('.sensorParameterArea')
-    m.Show(areaSelector)
+  activateSensorParameterFields = (activateSelector: string, buttonSelector?: string) => {
+    m.Show('#sensorParameterArea')
+    m.Hide('#sensorStatusArea')
+    m.Hide('.sensorParameter')
+    m.Show(activateSelector)
 
     if (buttonSelector) {
       m.RemoveClass('.buttonSelectSensor', 'btn-primary')
@@ -67,13 +103,43 @@ class JobSubmitter {
     }
   }
 
-  getSensorParameters = (): SensorParametersTest|null => {
+  getSensorParameters = (): SensorParametersTest|SensorParametersDS18B20|SensorParametersMAX6675|null => {
     if (this.selectedSensor === 'test') {
-      return {
+      const parameters: SensorParametersTest = {
         nemok_sensor_test_http: 1,
-        nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterTestSsid'),
-        nemok_wifi_pass: m.GetFormInputValue('#sensorParameterTestPassword')
+        nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterSsid'),
+        nemok_wifi_pass: m.GetFormInputValue('#sensorParameterPass')
       }
+
+      return parameters
+    }
+
+    if (this.selectedSensor === 'ds18b20') {
+      const parameters: SensorParametersDS18B20 = {
+        nemok_sensor_temp_ds18b20: 1,
+        nemok_sensor_hostname: m.GetFormInputValue('#sensorParameterHostname'),
+        nemok_sensor_delay: +m.GetFormInputValue('#sensorParameterSensorDelay'),
+        nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterSsid'),
+        nemok_wifi_pass: m.GetFormInputValue('#sensorParameterPass'),
+        nemok_signalk_server_host: m.GetFormInputValue('#sensorParameterServerHost'),
+        nemok_signalk_server_port: +m.GetFormInputValue('#sensorParameterServerPort')
+      }
+
+      return parameters
+    }
+
+    if (this.selectedSensor === 'max6675') {
+      const parameters: SensorParametersMAX6675 = {
+        nemok_sensor_temp_max6675: 1,
+        nemok_sensor_hostname: m.GetFormInputValue('#sensorParameterHostname'),
+        nemok_sensor_delay: +m.GetFormInputValue('#sensorParameterSensorDelay'),
+        nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterSsid'),
+        nemok_wifi_pass: m.GetFormInputValue('#sensorParameterPass'),
+        nemok_signalk_server_host: m.GetFormInputValue('#sensorParameterServerHost'),
+        nemok_signalk_server_port: +m.GetFormInputValue('#sensorParameterServerPort')
+      }
+
+      return parameters
     }
 
     return null

@@ -23,3 +23,7 @@ h2 {
 #panelDebugTerminal {
     display: none;
 }
+
+.buttonSelectSensor {
+    margin: 0.5em;
+}

@@ -30,6 +30,32 @@ class InputValidator {
             }
         }
 
+        if ($jobParameters['nemok_sensor_temp_ds18b20'] != '') {
+            $validatedParameters['NEMOK_SENSOR_TEMP_DS18B20'] = '1';
+
+            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_ssid'], 'SSID');
+            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_pass'], 'WiFi password');
+
+            $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric($jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
+            $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric($jobParameters['nemok_sensor_delay'], 'Sensor Delay');
+
+            $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots($jobParameters['nemok_signalk_server_host'], 'Server Host');
+            $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric($jobParameters['nemok_signalk_server_port'], 'Server Port');
+        }
+
+        if ($jobParameters['nemok_sensor_temp_max6675'] != '') {
+            $validatedParameters['NEMOK_SENSOR_TEMP_MAX6675'] = '1';
+
+            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_ssid'], 'SSID');
+            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_pass'], 'WiFi password');
+
+            $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric($jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
+            $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric($jobParameters['nemok_sensor_delay'], 'Sensor Delay');
+
+            $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots($jobParameters['nemok_signalk_server_host'], 'Server Host');
+            $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric($jobParameters['nemok_signalk_server_port'], 'Server Port');
+        }
+
         return $validatedParameters;
     }
 
@@ -62,6 +88,19 @@ class InputValidator {
             }
             else {
                 throw new \Exception('given value "'.$field.'" is not alphanumeric');
+            }
+        }
+
+        return $str;
+    }
+
+    function validateAlphanumericWithDots($str, $field=null) {
+        if (preg_match('/[^\w\d\-_\.]/', $str)) {
+            if (is_null($field)) {
+                throw new \Exception('given value is not alphanumeric-with-dots');
+            }
+            else {
+                throw new \Exception('given value "'.$field.'" is not alphanumeric-with-dots');
             }
         }
 

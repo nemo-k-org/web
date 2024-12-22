@@ -100,6 +100,40 @@ test('should require a defined set of parameters', async () => {
             body: customerData.customerCode,
             expectedStatus: 200,
             case: 'contains all required parameters'
+        },
+        {
+            params: {
+                customerCode: customerData.customerCode,
+                jobParameters: {
+                    nemok_sensor_temp_ds18b20: 1,
+                    nemok_wifi_ssid: 'test-ssid',
+                    nemok_wifi_pass: 'test-pass',
+                    nemok_sensor_hostname: 'TestSensor',
+                    nemok_sensor_delay: 1000,
+                    nemok_signalk_server_host: '127.0.0.1',
+                    nemok_signalk_server_port: 3000
+                }
+            },
+            body: customerData.customerCode,
+            expectedStatus: 200,
+            case: 'contains all required parameters for sensor ds18b20'
+        },
+        {
+            params: {
+                customerCode: customerData.customerCode,
+                jobParameters: {
+                    nemok_sensor_temp_max6675: 1,
+                    nemok_wifi_ssid: 'test-ssid',
+                    nemok_wifi_pass: 'test-pass',
+                    nemok_sensor_hostname: 'TestSensor',
+                    nemok_sensor_delay: 1000,
+                    nemok_signalk_server_host: '127.0.0.1',
+                    nemok_signalk_server_port: 3000
+                }
+            },
+            body: customerData.customerCode,
+            expectedStatus: 200,
+            case: 'contains all required parameters for sensor max6675'
         }
     ]
 

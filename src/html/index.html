@@ -81,31 +81,79 @@
                             <p>Select sensor type:</p>
                             <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
                             <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
+                            <button id="buttonSelectSensorDS18B20" class="btn buttonSelectSensor" type="button">Temperature DS18B20</button>
+                            <button id="buttonSelectSensorMAX6675" class="btn buttonSelectSensor" type="button">Temperature MAX6675</button>
                 
-                            <div id="sensorParameterAreaNone" class="sensorParameterArea">
-                                <p>Please select sensor type.</p>
-                            </div>
-                
-                            <div id="sensorParameterAreaTest" class="sensorParameterArea">
-                                <div class="form-group">
-                                    <label for="sensorParameterTestSsid">Your WiFi SSID</label>
-                                    <input type="text" class="form-control" id="sensorParameterTestSsid" aria-describedby="sensorParameterTestSsidHelp">
-                                    <small id="sensorParameterTestSsidHelp" class="form-text text-muted">
+                            <div id="sensorParameterArea">
+                                <p class="sensorParameter sensorParameterNone">Please select sensor type.</p>
+
+                                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterSsid">Your WiFi SSID</label>
+                                    <input type="text" class="form-control" id="sensorParameterSsid" aria-describedby="sensorParameterSsidHelp">
+                                    <small id="sensorParameterSsidHelp" class="form-text text-muted">
                                         The network name of your yacht for sensor to connect.
                                         Valid characters are a-z, A-Z, 0-9, - and _.
                                     </small>
                                 </div>
-                                <div class="form-group">
-                                    <label for="sensorParameterTestPassword">Your WiFi password</label>
-                                    <input type="text" class="form-control" id="sensorParameterTestPassword" aria-describedby="sensorParameterTestPasswordHelp">
-                                    <small id="sensorParameterTestPasswordHelp" class="form-text text-muted">
+
+                                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterPass">Your WiFi password</label>
+                                    <input type="text" class="form-control" id="sensorParameterPass" aria-describedby="sensorParameterPassHelp">
+                                    <small id="sensorParameterPassHelp" class="form-text text-muted">
                                         The network password of your yacht for sensor to connect
                                         Valid characters are a-z, A-Z, 0-9, - and _.
                                     </small>
                                 </div>
+
+                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterHostname">Sensor Name</label>
+                                    <input type="text" class="form-control" id="sensorParameterHostname" aria-describedby="sensorParameterHostnameHelp">
+                                    <small id="sensorParameterHostnameHelp" class="form-text text-muted">
+                                        Sensor name. This will be visible to SignalK server administrator.
+                                        Valid characters are a-z, A-Z, 0-9, - and _.
+                                    </small>
+                                </div>
+
+                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterSensorDelay">Sensor Delay</label>
+                                    <input type="text" class="form-control" id="sensorParameterSensorDelay" aria-describedby="sensorParameterSensorDelayHelp">
+                                    <small id="sensorParameterSensorDelayHelp" class="form-text text-muted">
+                                        Delay in milliseconds between sensor value updates. Reasonable values start
+                                        from 1000 where the sensor sends a new reading to server every second.
+                                        Valid characters are 0-9.
+                                    </small>
+                                </div>
+
+                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterKey">SignalK Data Key</label>
+                                    <input type="text" class="form-control" id="sensorParameterKey" aria-describedby="sensorParameterKey">
+                                    <small id="sensorParameterKeyHelp" class="form-text text-muted">
+                                        SignalK data key.
+                                        Valid characters are a-z, A-Z, 0-9, -, _ and . (dot).
+                                    </small>
+                                </div>
+
+                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterServerHost">Server Host</label>
+                                    <input type="text" class="form-control" id="sensorParameterServerHost" aria-describedby="sensorParameterServerHostHelp">
+                                    <small id="sensorParameterServerHostHelp" class="form-text text-muted">
+                                        SignalK Server Hostname. This is ether IP or DNS address of your SignalK server.
+                                        Valid characters are a-z, A-Z, 0-9, - and _.
+                                    </small>
+                                </div>
+
+                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                                    <label for="sensorParameterServerPort">Server Port Number</label>
+                                    <input type="text" class="form-control" id="sensorParameterServerPort" aria-describedby="sensorParameterPortHelp">
+                                    <small id="sensorParameterPortHelp" class="form-text text-muted">
+                                        SignalK Server Port number. This is typically 80 or 3000.
+                                        Valid characters are 0-9.
+                                    </small>
+                                </div>
+
                             </div>
 
-                            <div id="sensorParameterAreaStatus" class="sensorParameterArea">
+                            <div id="sensorStatusArea">
                                 <p>Job status:</p>
                                 <div id="submitJobStatus"></div>
                             </div>
