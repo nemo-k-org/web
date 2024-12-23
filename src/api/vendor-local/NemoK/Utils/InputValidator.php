@@ -19,41 +19,49 @@ class InputValidator {
         // NB! There should be no integers among values, otherwise AWS Serialization will croak:
         // SerializationException (client): class com.amazon.coral.value.json.numbers.TruncatingBigNumber can not be converted to an String
 
-        if ($jobParameters['nemok_sensor_test_http'] != '') {
+        if (@$jobParameters['nemok_sensor_test_http'] != '') {
             $validatedParameters['NEMOK_SENSOR_TEST_HTTP'] = '1';
 
-            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_ssid'], 'SSID');
-            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_pass'], 'WiFi password');
+            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric(@$jobParameters['nemok_wifi_ssid'], 'SSID');
+            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric(@$jobParameters['nemok_wifi_pass'], 'WiFi password');
 
             if ($this->missingRequiredFields($validatedParameters, ['NEMOK_WIFI_SSID', 'NEMOK_WIFI_PASS'])) {
                 throw new \Exception('Missing required parameters');
             }
         }
 
-        if ($jobParameters['nemok_sensor_temp_ds18b20'] != '') {
+        if (@$jobParameters['nemok_sensor_temp_ds18b20'] != '') {
             $validatedParameters['NEMOK_SENSOR_TEMP_DS18B20'] = '1';
 
-            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_ssid'], 'SSID');
-            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_pass'], 'WiFi password');
+            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric(@$jobParameters['nemok_wifi_ssid'], 'SSID');
+            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric(@$jobParameters['nemok_wifi_pass'], 'WiFi password');
 
-            $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric($jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
-            $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric($jobParameters['nemok_sensor_delay'], 'Sensor Delay');
+            $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric(@$jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
+            $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric(@$jobParameters['nemok_sensor_delay'], 'Sensor Delay');
 
-            $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots($jobParameters['nemok_signalk_server_host'], 'Server Host');
-            $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric($jobParameters['nemok_signalk_server_port'], 'Server Port');
+            $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots(@$jobParameters['nemok_signalk_server_host'], 'Server Host');
+            $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric(@$jobParameters['nemok_signalk_server_port'], 'Server Port');
+
+            if ($this->missingRequiredFields($validatedParameters, ['NEMOK_WIFI_SSID', 'NEMOK_WIFI_PASS', 'NEMOK_SENSOR_HOSTNAME'])) {
+                throw new \Exception('Missing required parameters');
+            }
         }
 
-        if ($jobParameters['nemok_sensor_temp_max6675'] != '') {
+        if (@$jobParameters['nemok_sensor_temp_max6675'] != '') {
             $validatedParameters['NEMOK_SENSOR_TEMP_MAX6675'] = '1';
 
-            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_ssid'], 'SSID');
-            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric($jobParameters['nemok_wifi_pass'], 'WiFi password');
+            $validatedParameters['NEMOK_WIFI_SSID'] = $this->validateAlphanumeric(@$jobParameters['nemok_wifi_ssid'], 'SSID');
+            $validatedParameters['NEMOK_WIFI_PASS'] = $this->validateAlphanumeric(@$jobParameters['nemok_wifi_pass'], 'WiFi password');
 
-            $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric($jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
-            $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric($jobParameters['nemok_sensor_delay'], 'Sensor Delay');
+            $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric(@$jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
+            $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric(@$jobParameters['nemok_sensor_delay'], 'Sensor Delay');
 
-            $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots($jobParameters['nemok_signalk_server_host'], 'Server Host');
-            $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric($jobParameters['nemok_signalk_server_port'], 'Server Port');
+            $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots(@$jobParameters['nemok_signalk_server_host'], 'Server Host');
+            $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric(@$jobParameters['nemok_signalk_server_port'], 'Server Port');
+
+            if ($this->missingRequiredFields($validatedParameters, ['NEMOK_WIFI_SSID', 'NEMOK_WIFI_PASS', 'NEMOK_SENSOR_HOSTNAME'])) {
+                throw new \Exception('Missing required parameters');
+            }
         }
 
         return $validatedParameters;
