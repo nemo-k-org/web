@@ -42,6 +42,8 @@ test('firmware upload should check zip and its content', async () => {
     const jobId = await utilDatabase.addJob(customerData.customerId)
 
     const testCases = [
+        ['test/resources/nemo-k-firmware-wrongpassword.zip', 551],
+        ['test/resources/nemo-k-firmware-nopassword.zip', 551],
         ['test/resources/nemo-k-firmware-nohashfile.zip', 551],
         ['test/resources/nemo-k-firmware-tampered.zip', 551],
         ['test/resources/nemo-k-firmware-badhashfile.zip', 551],

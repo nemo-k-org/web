@@ -107,6 +107,7 @@ class Jobs {
 
         $jobParameters = $jobData['parameters'];
         $jobParameters['NEMOK_UPLOAD_URL'] = $this->getFirmwareUploadURL($jobIdSafe);
+        $jobParameters['NEMOK_ZIP_PASSWORD'] = NEMOK_ZIP_PASSWORD;
 
         $this->logger->debug('submitting job to CI', [$jobIdSafe, $jobParameters]);
 

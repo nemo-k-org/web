@@ -29,7 +29,9 @@ define('AWS_CODEBUILD', [
     'codeBuildProjectname' => 'Nemo-K-firmware',
 ]);
 
-  define('LOG_LEVEL', \Monolog\Logger::DEBUG);
+define('NEMOK_ZIP_PASSWORD', 'secret-password');
+
+define('LOG_LEVEL', \Monolog\Logger::DEBUG);
 
 if (getenv('NEMOK_LOG_FILE')) {
     define('LOG_FILE', getenv('NEMOK_LOG_FILE'));

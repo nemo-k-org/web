@@ -42,19 +42,17 @@ class Firmwares {
             return Http::STATUS_CODE_ERROR_FAILED_FILE_UPLOAD;
         }
 
+        if (!$this->isPasswordProtectedFirmwareZip($uploadedFile)) {
+            $this->logger->warning('Job ID was updated with unencrypted firmware file', [$jobId, $uploadedFile]);
+            return Http::STATUS_CODE_ERROR_FAILED_FILE_UPLOAD;
+        }
+
         if (!$this->isProperFirmwareZip($uploadedFile)) {
             $this->logger->warning("Job ID was updated with failing firmware file", [$jobId, $uploadedFile]);
             return Http::STATUS_CODE_ERROR_FAILED_FILE_UPLOAD;
         }
 
         $firmwareFinalFilename = $this->getFirmwareFilename($jobId);
-
-        if (is_file($firmwareFinalFilename)) {
-            if (!unlink($firmwareFinalFilename)) {
-                $this->logger->error("Could not unlink already existing firmware file", [$jobId, $uploadedFile, $firmwareFinalFilename]);
-                return Http::STATUS_CODE_ERROR_INTERNAL_SERVER_ERROR;
-            }
-        }
 
         if (!$this->unzipFirmware($uploadedFile, $firmwareFinalFilename)) {
             $this->logger->error("Could not extract firmware", [$jobId, $uploadedFile, $firmwareFinalFilename]);
@@ -102,6 +100,32 @@ class Firmwares {
         return true;
     }
 
+    private function isPasswordProtectedFirmwareZip($uploadedFile) {
+        try {
+            $tempDir = $this->createTempDir();
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to create temporary directory', [$uploadedFile, $firmwareTargetPath, $e]);
+            return false;
+        }
+
+        $zip = new \ZipArchive();
+        $result = $zip->open($uploadedFile, \ZipArchive::RDONLY);
+
+        if ($result !== TRUE) {
+            $this->logger->error('Could not open zip for reading', [$uploadedFile, $result]);
+            return false;
+        }
+
+        if ($zip->extractTo($tempDir, self::REQUIRED_FILES) === TRUE) {
+            $this->logger->warning('Zip could be decrypted without password: no valid firmware file', [$uploadedFile, $tempDir]);
+            $this->removeDir($tempDir);
+            return false;
+        }
+
+        $this->removeDir($tempDir);
+
+        return true;
+    }
 
     function ensureFirmwarePathExists() {
         if (!is_dir(FIRMWARE_PATH)) {
@@ -123,6 +147,8 @@ class Firmwares {
             return false;
         }
 
+        $this->logger->debug('Starting to unzip firmware', [$uploadedFile, $firmwareTargetPath, $tempDir]);
+
         $zip = new \ZipArchive();
         $result = $zip->open($uploadedFile, \ZipArchive::RDONLY);
 
@@ -130,6 +156,10 @@ class Firmwares {
             $this->logger->error('Could not open zip archive', [$uploadedFile, $firmwareTargetPath, $result]);
             return false;
         }
+
+        $this->logger->debug('Now setting unzip password', [$uploadedFile, $firmwareTargetPath, $tempDir]);
+
+        $zip->setPassword(NEMOK_ZIP_PASSWORD);
 
         $this->logger->debug('Now extracting zip archive', [$uploadedFile, $firmwareTargetPath, $tempDir]);
 
@@ -141,7 +171,16 @@ class Firmwares {
 
         $zip->close();
 
+        $this->logger->debug('Firmware zip unzipped successfully', [$uploadedFile, $firmwareTargetPath, $tempDir]);
+
         $firmwareFilePath = $tempDir.'/firmware.bin';
+
+        if (!is_file($firmwareFilePath)) {
+            $this->logger->error("After unzipping could not find firmware file", [$uploadedFile, $firmwareTargetPath, $tempDir, $firmwareFilePath]);
+            $this->removeDir($tempDir);
+            return false;
+        }
+
         $hashObserved = hash_file('sha256', $firmwareFilePath);
         if ($hashObserved === FALSE) {
             $this->logger->error('Could not calculate hash from given firmware file', [$uploadedFile, $firmwareTargetPath, $tempDir, $firmwareFilePath]);
@@ -150,6 +189,13 @@ class Firmwares {
         }
 
         $hashFilePath = $tempDir.'/firmware.bin.sha256';
+
+        if (!is_file($hashFilePath)) {
+            $this->logger->error("After unzipping could not find sha256 file", [$uploadedFile, $firmwareTargetPath, $tempDir, $hashFilePath]);
+            $this->removeDir($tempDir);
+            return false;
+        }
+
         $hashExpected = $this->getValueFromHashFile($hashFilePath);
         if (is_null($hashExpected)) {
             $this->logger->error('Could not extract expected hash from given hash file', [$uploadedFile, $firmwareTargetPath, $tempDir, $hashFilePath]);
@@ -161,6 +207,14 @@ class Firmwares {
             $this->logger->error('Firmware hash check failed', [$uploadedFile, $firmwareTargetPath, $tempDir, $hashFilePath, $hashExpected, $hashObserved]);
             $this->removeDir($tempDir);
             return false;
+        }
+
+        if (is_file($firmwareTargetPath)) {
+            $this->logger->debug('Target firmware file exists, deleting', [$firmwareFilePath, $firmwareTargetPath]);
+            if (!unlink($firmwareTargetPath)) {
+                $this->logger->error('Could not unlink existing target firmware file', [$uploadedFile, $firmwareFilePath, $firmwareTargetPath]);
+                return false;
+            }
         }
 
         if (!copy($firmwareFilePath, $firmwareTargetPath)) {
