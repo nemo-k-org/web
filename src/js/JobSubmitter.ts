@@ -12,6 +12,7 @@ interface SensorParametersDS18B20 {
   nemok_sensor_temp_ds18b20: number,
   nemok_sensor_hostname: string;
   nemok_sensor_delay: number;
+  nemok_sensor_key: string;
   nemok_wifi_ssid: string;
   nemok_wifi_pass: string;
   nemok_signalk_server_host: string;
@@ -22,6 +23,7 @@ interface SensorParametersMAX6675 {
   nemok_sensor_temp_max6675: number,
   nemok_sensor_hostname: string;
   nemok_sensor_delay: number;
+  nemok_sensor_key: string;
   nemok_wifi_ssid: string;
   nemok_wifi_pass: string;
   nemok_signalk_server_host: string;
@@ -119,6 +121,7 @@ class JobSubmitter {
         nemok_sensor_temp_ds18b20: 1,
         nemok_sensor_hostname: m.GetFormInputValue('#sensorParameterHostname'),
         nemok_sensor_delay: +m.GetFormInputValue('#sensorParameterSensorDelay'),
+        nemok_sensor_key: m.GetFormInputValue('#sensorParameterKey'),
         nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterSsid'),
         nemok_wifi_pass: m.GetFormInputValue('#sensorParameterPass'),
         nemok_signalk_server_host: m.GetFormInputValue('#sensorParameterServerHost'),
@@ -133,6 +136,7 @@ class JobSubmitter {
         nemok_sensor_temp_max6675: 1,
         nemok_sensor_hostname: m.GetFormInputValue('#sensorParameterHostname'),
         nemok_sensor_delay: +m.GetFormInputValue('#sensorParameterSensorDelay'),
+        nemok_sensor_key: m.GetFormInputValue('#sensorParameterKey'),
         nemok_wifi_ssid: m.GetFormInputValue('#sensorParameterSsid'),
         nemok_wifi_pass: m.GetFormInputValue('#sensorParameterPass'),
         nemok_signalk_server_host: m.GetFormInputValue('#sensorParameterServerHost'),

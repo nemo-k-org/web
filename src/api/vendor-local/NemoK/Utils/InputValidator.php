@@ -38,6 +38,7 @@ class InputValidator {
 
             $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric(@$jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
             $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric(@$jobParameters['nemok_sensor_delay'], 'Sensor Delay');
+            $validatedParameters['NEMOK_SENSOR_KEY'] = "".$this->validateAlphanumericWithDots(@$jobParameters['nemok_sensor_key'], 'Sensor Key');
 
             $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots(@$jobParameters['nemok_signalk_server_host'], 'Server Host');
             $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric(@$jobParameters['nemok_signalk_server_port'], 'Server Port');
@@ -55,6 +56,7 @@ class InputValidator {
 
             $validatedParameters['NEMOK_SENSOR_HOSTNAME'] = $this->validateAlphanumeric(@$jobParameters['nemok_sensor_hostname'], 'Sensor Hostname');
             $validatedParameters['NEMOK_SENSOR_DELAY'] = "".$this->validateNumeric(@$jobParameters['nemok_sensor_delay'], 'Sensor Delay');
+            $validatedParameters['NEMOK_SENSOR_KEY'] = "".$this->validateAlphanumericWithDots(@$jobParameters['nemok_sensor_key'], 'Sensor Key');
 
             $validatedParameters['NEMOK_SIGNALK_SERVER_HOST'] = $this->validateAlphanumericWithDots(@$jobParameters['nemok_signalk_server_host'], 'Server Host');
             $validatedParameters['NEMOK_SIGNALK_SERVER_PORT'] = "".$this->validateNumeric(@$jobParameters['nemok_signalk_server_port'], 'Server Port');
