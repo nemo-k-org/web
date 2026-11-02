@@ -1,11 +1,3 @@
-composer.phar: tools/install-composer.sh
-	tools/install-composer.sh
-	touch composer.phar
-
-phpab.phar: tools/install-phpab.sh
-	tools/install-phpab.sh
-	touch phpab.phar
-
 build/index.html: src/html/index.html
 	cp src/html/index.html build/
 
@@ -21,38 +13,16 @@ build/xterm.css: node_modules/xterm/css/xterm.css
 build/xterm.js: node_modules/xterm/lib/xterm.js
 	cp node_modules/xterm/lib/xterm.js build/
 
-build/.htaccess: src/conf/apache.htaccess
-	cp src/conf/apache.htaccess build/.htaccess
-
-.PHONY: build/vendor-local/autoload.php
-build/vendor-local/autoload.php:
-	./phpab.phar -o build/vendor-local/autoload.php build/vendor-local/
-
-.PHONY: build-backend-composer
-composer-install: composer.json composer.phar
-	mkdir -p build/vendor/
-	COMPOSER_VENDOR_DIR=build/vendor/ php composer.phar install
-
-.PHONY: vendor-local-install
-vendor-local-install:
-	cp -r src/api/vendor-local/ build/
-
-.PHONY: api
-api: composer-install vendor-local-install build/vendor-local/autoload.php
-	cp src/api/*.php build/
-
 .PHONY: lint-js
 lint-js:
 	npx eslint "src/js/**"
 
 .PHONY: build
-build: lint-js build/bundle.js build/index.html build/index.css build/xterm.css build/xterm.js build/.htaccess api
+build: lint-js build/bundle.js build/index.html build/index.css build/xterm.css build/xterm.js
 
 .PHONY: start
-start: stop
-	-rm -fR $(PWD)/apache/modules
-	ln -sf /usr/lib/apache2/modules $(PWD)/apache/
-	SERVER_ROOT=$(PWD) /usr/sbin/apache2 -X -f $(PWD)/apache2.conf
+start:
+	cd build; python3 -m http.server
 
 start-test: stop
 	-rm -fR $(PWD)/apache/modules
