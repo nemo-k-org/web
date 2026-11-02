@@ -36,7 +36,7 @@ export const Hide = (selector: string) => {
 export const Show = (selector: string) => {
   const elements = document.querySelectorAll<HTMLElement>(selector)
   elements.forEach((element) => {
-    if (element.tagName === 'A') {
+    if (['A', 'SPAN'].includes(element.tagName)) {
       element.style.display = 'inline'
     } else {
       element.style.display = 'block'
@@ -160,6 +160,25 @@ export const GetFormInputValue = (selector: string): string => {
   return value
 }
 
+export const GetFormRadioValue = (name: string): string|null => {
+  const options = Array.from(document.querySelectorAll<HTMLInputElement>(`input[name="${name}"]:checked`))
+
+  if (options && options.length === 1) {
+    return options[0].value
+  }
+
+  return null
+}
+
+export const GetFormCheckboxIsChecked = (id: string): boolean => {
+  const element = document.querySelector<HTMLInputElement>(`#${id}`)
+  if (element && element.checked) {
+    return true
+  }
+
+  return false
+}
+
 export const SetFormInputValue = (selector: string, value: string) => {
   const elements = Array.from(document.querySelectorAll<HTMLInputElement>(selector))
   elements.forEach((element) => { element.value = value })
@@ -182,6 +201,11 @@ export const GetAttribute = (selector: string, attribute: string): string => {
   elements.forEach((element) => { value = element.getAttribute(attribute) })
 
   return value
+}
+
+export const SetAttribute = (selector: string, attribute: string, value: string): void => {
+  const elements = Array.from(document.querySelectorAll<HTMLElement>(selector))
+  elements.forEach((element) => { element.setAttribute(attribute, value) })
 }
 
 export const Remove = (selector: string) => {
