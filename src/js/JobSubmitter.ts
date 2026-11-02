@@ -155,7 +155,7 @@ class JobSubmitter {
 
     try {
       const response = await axios.post('/api/jobs', {
-        jobParameters: jobParameters,
+        jobParameters,
         customerCode: this.functionCustomerCode()
       })
 
