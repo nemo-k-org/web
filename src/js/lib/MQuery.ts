@@ -138,7 +138,7 @@ export const OnClick = (selector: string, clickFn: Function) => {
 export const OnEvent = (selector: string, eventType: string, clickFn: Function) => {
   intialiseMQueryEventHandlers(eventType)
 
-  MQueryEventHandlers.push({ selector: selector, eventType: eventType, eventListenerFn: clickFn })
+  MQueryEventHandlers.push({ selector, eventType, eventListenerFn: clickFn })
 }
 
 export const FormInputDisable = (selector: string) => {
