@@ -1,11 +1,20 @@
 build/index.html: src/html/index.html
 	cp src/html/index.html build/
 
-build/index.css: src/html/index.css
-	cp src/html/index.css build/
+build/local.css: src/html/index.css
+	cp src/html/index.css build/local.css
 
-build/bundle.js: src/js/*
-	npx webpack --config webpack.js
+.PHONY: clean-build-targets
+clean-build-targets:
+	-rm build/index.*
+
+.PHONY: build-dev
+build-js-dev: clean-build-targets
+	node ./esbuild.dev.mjs
+
+.PHONY: build-prod
+build-js-prod: clean-build-targets
+	node ./esbuild.prod.mjs
 
 build/xterm.css: node_modules/xterm/css/xterm.css
 	cp node_modules/xterm/css/xterm.css build/
@@ -17,8 +26,11 @@ build/xterm.js: node_modules/xterm/lib/xterm.js
 lint-js:
 	npx eslint "src/js/**"
 
-.PHONY: build
-build: lint-js build/bundle.js build/index.html build/index.css build/xterm.css build/xterm.js
+.PHONY: build-dev
+build-dev: lint-js build-js-dev build/index.html build/local.css build/xterm.css build/xterm.js
+
+.PHONY: build-prod
+build-prod: lint-js build-js-prod build/index.html build/local.css build/xterm.css build/xterm.js
 
 .PHONY: start
 start:

@@ -5,7 +5,8 @@
         <link rel="stylesheet" href="xterm.css" />
         <link rel="stylesheet" href="main.css" />
         <link rel="stylesheet" href="index.css" />
-        <script src="bundle.js"></script>
+        <link rel="stylesheet" href="local.css" />
+        <script src="index.js"></script>
     </head>
     <body>
         <h1>Nemo-K Flash Tool</h1>
@@ -20,183 +21,153 @@
             </p>
         </div>
 
-        <div id="panelMainButtons">
-            <button type="button" class="btn" id="buttonOpenModalUserAccountDialog"></button>
 
-            <button type="button" class="btn" id="buttonOpenModalCreateProgramDialog" data-bs-toggle="modal" data-bs-target="#modalCreateProgramDialog">
-                Create a New Program
-            </button>
-        </div>
+        <h2>Select and upload program</h2>
 
         <form>
-
-            <div id="modalUserAccountDialog" class="modal fade" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Enter Your Customer Code</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="customerCode">Please enter your customer code given to you by Nemo-K admins</label>
-                                <input type="text" class="form-control" id="customerCode" aria-describedby="customerCodeHelp">
-                                <small id="customerCodeHelp" class="form-text text-muted">
-                                    At the moment we don't give new customer codes.
-                                </small>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="buttonUseCustomerCode">Continue</button>
-                        </div>
-                    </div>
-                </div>
+            <p>Select sensor type:</p>
+            <div class="form-check">
+                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeNone" value="none" checked>
+                <label class="form-check-label" for="sensorTypeNone">
+                    Default radio
+                </label>
             </div>
 
-            <h2>Your programs</h2>
-
-            <table id="tableJobs" class="table">
-                <thead>
-                    <th>Upload</th>
-                    <th>Status</th>
-                    <th>Age</th>
-                    <th>Parameters</th>
-                    <th>jobId</th>
-                </thead>
-            </table>
-
-            <div id="modalCreateProgramDialog" class="modal fade" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Create a New Program</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>
-                                Start by creating a program for your microcontroller. Choose the sensor
-                                type and select the options below.
-                            </p>
-                            <p>Select sensor type:</p>
-                            <button id="buttonSelectSensorNone" class="btn buttonSelectSensor" type="button">None</button>
-                            <button id="buttonSelectSensorTest" class="btn buttonSelectSensor" type="button">Test</button>
-                            <button id="buttonSelectSensorDS18B20" class="btn buttonSelectSensor" type="button">Temperature DS18B20</button>
-                            <button id="buttonSelectSensorMAX6675" class="btn buttonSelectSensor" type="button">Temperature MAX6675</button>
-                
-                            <div id="sensorParameterArea">
-                                <p class="sensorParameter sensorParameterNone">Please select sensor type.</p>
-
-                                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterSsid">Your WiFi SSID</label>
-                                    <input type="text" class="form-control" id="sensorParameterSsid" aria-describedby="sensorParameterSsidHelp">
-                                    <small id="sensorParameterSsidHelp" class="form-text text-muted">
-                                        The network name of your yacht for sensor to connect.
-                                        Valid characters are a-z, A-Z, 0-9, - and _.
-                                    </small>
-                                </div>
-
-                                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterPass">Your WiFi password</label>
-                                    <input type="text" class="form-control" id="sensorParameterPass" aria-describedby="sensorParameterPassHelp">
-                                    <small id="sensorParameterPassHelp" class="form-text text-muted">
-                                        The network password of your yacht for sensor to connect
-                                        Valid characters are a-z, A-Z, 0-9, - and _.
-                                    </small>
-                                </div>
-
-                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterHostname">Sensor Name</label>
-                                    <input type="text" class="form-control" id="sensorParameterHostname" aria-describedby="sensorParameterHostnameHelp">
-                                    <small id="sensorParameterHostnameHelp" class="form-text text-muted">
-                                        Sensor name. This will be visible to SignalK server administrator.
-                                        Valid characters are a-z, A-Z, 0-9, - and _.
-                                    </small>
-                                </div>
-
-                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterSensorDelay">Sensor Delay</label>
-                                    <input type="text" class="form-control" id="sensorParameterSensorDelay" aria-describedby="sensorParameterSensorDelayHelp">
-                                    <small id="sensorParameterSensorDelayHelp" class="form-text text-muted">
-                                        Delay in milliseconds between sensor value updates. Reasonable values start
-                                        from 1000 where the sensor sends a new reading to server every second.
-                                        Valid characters are 0-9.
-                                    </small>
-                                </div>
-
-                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterKey">SignalK Data Key</label>
-                                    <input type="text" class="form-control" id="sensorParameterKey" aria-describedby="sensorParameterKey">
-                                    <small id="sensorParameterKeyHelp" class="form-text text-muted">
-                                        SignalK data key.
-                                        Valid characters are a-z, A-Z, 0-9, -, _ and . (dot).
-                                    </small>
-                                </div>
-
-                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterServerHost">Server Host</label>
-                                    <input type="text" class="form-control" id="sensorParameterServerHost" aria-describedby="sensorParameterServerHostHelp">
-                                    <small id="sensorParameterServerHostHelp" class="form-text text-muted">
-                                        SignalK Server Hostname. This is ether IP or DNS address of your SignalK server.
-                                        Valid characters are a-z, A-Z, 0-9, - and _.
-                                    </small>
-                                </div>
-
-                                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
-                                    <label for="sensorParameterServerPort">Server Port Number</label>
-                                    <input type="text" class="form-control" id="sensorParameterServerPort" aria-describedby="sensorParameterPortHelp">
-                                    <small id="sensorParameterPortHelp" class="form-text text-muted">
-                                        SignalK Server Port number. This is typically 80 or 3000.
-                                        Valid characters are 0-9.
-                                    </small>
-                                </div>
-
-                            </div>
-
-                            <div id="sensorStatusArea">
-                                <p>Job status:</p>
-                                <div id="submitJobStatus"></div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="buttonSubmitJob">Create Program</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-check">
+                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeTest" value="test">
+                <label class="form-check-label" for="sensorTypeTest">
+                    Test sensor
+                </label>
             </div>
 
-            <div id="modalUploadFirmwareProgressDialog" class="modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Uploading</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="messageUploadFirmwareProgressContainer" class="progress" role="progressbar" aria-label="Upload progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <div id="messageUploadFirmwareProgressBar" class="progress-bar" style="width: 0%"></div>
-                              </div>
-                            <p id="messageUploadFirmwareProgress"></p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-check">
+                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeTempDS18B20" value="tempds18b20">
+                <label class="form-check-label" for="sensorTypeTempDS18B20">
+                    Temperature DS18B20
+                </label>
             </div>
 
-            <a href="#" id="buttonToggleDebugTerminal">Show/Hide Debug Terminal</a>
-            
-            <div id="panelDebugTerminal">
-                <h2>Debug Terminal</h2>
-    
-                <p>
-                    The terminal window below may contain information which may help
-                    in solving technical problems in uploading.
-                </p>
-                <div id="terminal"></div>
+            <div class="form-check">
+                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeTempMAX6675" value="tempmax6675">
+                <label class="form-check-label" for="sensorTypeTempMAX6675">
+                    Temperature MAX6675
+                </label>
             </div>
+ 
+            <button type="button" class="btn btn-primary" id="buttonUploadProgram">Upload Program</button>
         </form>
+
+        <h2>Configure and upload settings</h2>
+
+        <p>
+            Start by creating a program for your microcontroller. Choose the sensor
+            type and select the options below.
+        </p>
+
+        <form>
+            <div id="sensorParameterArea">
+                <p class="sensorParameter sensorParameterNone">Please select sensor type.</p>
+
+                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterSsid">Your WiFi SSID</label>
+                    <input type="text" class="form-control" id="sensorParameterSsid" aria-describedby="sensorParameterSsidHelp">
+                    <small id="sensorParameterSsidHelp" class="form-text text-muted">
+                        The network name of your yacht for sensor to connect.
+                        Valid characters are a-z, A-Z, 0-9, - and _.
+                    </small>
+                </div>
+
+                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterPass">Your WiFi password</label>
+                    <input type="text" class="form-control" id="sensorParameterPass" aria-describedby="sensorParameterPassHelp">
+                    <small id="sensorParameterPassHelp" class="form-text text-muted">
+                        The network password of your yacht for sensor to connect
+                        Valid characters are a-z, A-Z, 0-9, - and _.
+                    </small>
+                </div>
+
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterHostname">Sensor Name</label>
+                    <input type="text" class="form-control" id="sensorParameterHostname" aria-describedby="sensorParameterHostnameHelp">
+                    <small id="sensorParameterHostnameHelp" class="form-text text-muted">
+                        Sensor name. This will be visible to SignalK server administrator.
+                        Valid characters are a-z, A-Z, 0-9, - and _.
+                    </small>
+                </div>
+
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterSensorDelay">Sensor Delay</label>
+                    <input type="text" class="form-control" id="sensorParameterSensorDelay" aria-describedby="sensorParameterSensorDelayHelp">
+                    <small id="sensorParameterSensorDelayHelp" class="form-text text-muted">
+                        Delay in milliseconds between sensor value updates. Reasonable values start
+                        from 1000 where the sensor sends a new reading to server every second.
+                        Valid characters are 0-9.
+                    </small>
+                </div>
+
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterKey">SignalK Data Key</label>
+                    <input type="text" class="form-control" id="sensorParameterKey" aria-describedby="sensorParameterKey">
+                    <small id="sensorParameterKeyHelp" class="form-text text-muted">
+                        SignalK data key.
+                        Valid characters are a-z, A-Z, 0-9, -, _ and . (dot).
+                    </small>
+                </div>
+
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterServerHost">Server Host</label>
+                    <input type="text" class="form-control" id="sensorParameterServerHost" aria-describedby="sensorParameterServerHostHelp">
+                    <small id="sensorParameterServerHostHelp" class="form-text text-muted">
+                        SignalK Server Hostname. This is ether IP or DNS address of your SignalK server.
+                        Valid characters are a-z, A-Z, 0-9, - and _.
+                    </small>
+                </div>
+
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                    <label for="sensorParameterServerPort">Server Port Number</label>
+                    <input type="text" class="form-control" id="sensorParameterServerPort" aria-describedby="sensorParameterPortHelp">
+                    <small id="sensorParameterPortHelp" class="form-text text-muted">
+                        SignalK Server Port number. This is typically 80 or 3000.
+                        Valid characters are 0-9.
+                    </small>
+                </div>
+
+                </div>
+
+                <div id="modalUploadFirmwareProgressDialog" class="modal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Uploading</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="messageUploadFirmwareProgressContainer" class="progress" role="progressbar" aria-label="Upload progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <div id="messageUploadFirmwareProgressBar" class="progress-bar" style="width: 0%"></div>
+                                </div>
+                                <p id="messageUploadFirmwareProgress"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="buttonUploadSettings">Upload Settings</button>
+        </form>
+
+        <a href="#" id="buttonToggleDebugTerminal">Show/Hide Debug Terminal</a>
+        
+        <div id="panelDebugTerminal">
+            <h2>Debug Terminal</h2>
+
+            <p>
+                The terminal window below may contain information which may help
+                in solving technical problems in uploading.
+            </p>
+            <div id="terminal"></div>
+        </div>
     </body>
 </html>
