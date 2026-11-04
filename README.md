@@ -20,7 +20,5 @@ git clone git@github.com:nemo-k-org/web.git
 cd web
 npm install
 make build
-make test
 make start
-make stop
 ```

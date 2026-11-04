@@ -1,49 +1,38 @@
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
-import { Terminal } from 'xterm'
-
-import { arrayBufferToString } from '../lib/arrayBufferHelper'
 
 class FirmwareUploader {
-  serialTerminal: Terminal
   serialDevice: any
-  serialTransport: Transport
+  serialTransport: Transport | null
   espLoader: ESPLoader
   espLoaderTerminal: IEspLoaderTerminal
   connectedChip: string
   firmwareImage: ArrayBuffer
 
-  constructor () {
+  constructor(espLoaderTerminal: IEspLoaderTerminal) {
     this.serialDevice = null
+    this.serialTransport = null
     this.connectedChip = ''
-
-    window.addEventListener('load', () => {
-      this.activateTerminal()
-    })
+    this.espLoaderTerminal = espLoaderTerminal
+    this.firmwareImage = new ArrayBuffer()
   }
 
-  activateTerminal = () => {
-    const elTerminal = document.getElementById('terminal')
-    this.serialTerminal = new Terminal()
-    this.serialTerminal.open(elTerminal)
-  }
-
-  uploadFirmware = async (customerCode: string, jobId: string): Promise<boolean> => {
+  uploadFirmware = async (firmwareURL: string): Promise<boolean> => {
     if (!await this.serialConnect()) {
-      this.serialTerminal.writeln('Firmware upload failed: could not open serial connection')
+      this.espLoaderTerminal.writeLine('Firmware upload failed: could not open serial connection')
       await this.serialDisconnect()
       return false
     }
 
-    if (!await this.downloadFirmwareFromBackend(customerCode, jobId)) {
-      this.serialTerminal.writeln('Firmware upload failed: could not download firmware from backend')
+    if (!await this.downloadFirmwareFromBackend(firmwareURL)) {
+      this.espLoaderTerminal.writeLine('Firmware upload failed: could not download firmware from backend')
       await this.serialDisconnect()
       return false
     }
 
     if (!await this.uploadFirmwareToMicrocontroller()) {
-      this.serialTerminal.writeln('Firmware upload failed: could not upload firmware to microcontroller')
+      this.espLoaderTerminal.writeLine('Firmware upload failed: could not upload firmware to microcontroller')
       await this.serialDisconnect()
       return false
     }
@@ -56,11 +45,11 @@ class FirmwareUploader {
   serialConnect = async (): Promise<boolean> => {
     if (this.serialDevice === null) {
       try {
-        // @ts-ignore
+        // @ts-expect-error: for some reason "serial" is problematic
         this.serialDevice = await window.navigator.serial.requestPort({})
-      } catch (e) {
+      } catch (e: any) {
         console.error(e)
-        this.serialTerminal.writeln(`Error while selecting serial port: ${e.message}`)
+        this.espLoaderTerminal.writeLine(`Error while selecting serial port: ${e.message}`)
         return false
       }
 
@@ -81,11 +70,11 @@ class FirmwareUploader {
 
       // Temporarily broken
       // await this.espLoader.flashId();
-      this.serialTerminal.writeln(`Successfully connected to ${this.connectedChip}`)
+      this.espLoaderTerminal.writeLine(`Successfully connected to ${this.connectedChip}`)
       console.debug(`Connected to ${this.connectedChip}`)
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
-      this.serialTerminal.writeln(`Error: ${e.message}`)
+      this.espLoaderTerminal.writeLine(`Error: ${e.message}`)
       return false
     }
 
@@ -96,9 +85,10 @@ class FirmwareUploader {
     if (this.serialTransport) {
       try {
         await this.serialTransport.disconnect()
-        this.serialTerminal.writeln('Device disconnected successfully')
-      } catch (e) {
+        this.espLoaderTerminal.writeLine('Device disconnected successfully')
+      } catch (e: any) {
         console.error(`Error while closing serial port: ${e.message}`)
+        this.espLoaderTerminal.writeLine(`Error while closing serial port: ${e.message}`)
       }
     }
 
@@ -107,23 +97,21 @@ class FirmwareUploader {
     this.serialTransport = null
   }
 
-  downloadFirmwareFromBackend = async (customerCode: string, jobId: string): Promise<boolean> => {
+  downloadFirmwareFromBackend = async (firmwareURL: string): Promise<boolean> => {
     try {
-      const response = await axios.get(`/api/jobs/${jobId}/firmware`, {
-        responseType: 'arraybuffer',
-        headers: {
-          'NemoK-CustomerCode': customerCode
-        }
+      const response = await axios.get(firmwareURL, {
+        responseType: 'arraybuffer'
       })
 
       this.firmwareImage = response.data
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
-      this.serialTerminal.writeln(`Error while downloading firmware: ${e.message}`)
+      this.espLoaderTerminal.writeLine(`Error while downloading firmware: ${e.message}`)
       return false
     }
 
-    console.debug('firmware is loaded', customerCode, jobId, this.firmwareImage.byteLength)
+    this.espLoaderTerminal.writeLine(`Firmware downloaded from ${firmwareURL}, length: ${this.firmwareImage.byteLength}`)
+    console.debug('firmware is loaded', firmwareURL, this.firmwareImage.byteLength)
 
     return true
   }
@@ -131,7 +119,7 @@ class FirmwareUploader {
   uploadFirmwareToMicrocontroller = async (): Promise<boolean> => {
     const flashOptionsFileArray = [
       {
-        data: arrayBufferToString(this.firmwareImage),
+        data: new Uint8Array(this.firmwareImage),
         address: 0x0
       }
     ]
@@ -144,13 +132,17 @@ class FirmwareUploader {
         compress: true,
         flashMode: 'keep',
         flashFreq: 'keep',
-        calculateMD5Hash: (image: string) => CryptoJS.MD5(CryptoJS.enc.Latin1.parse(image)).toString()
+        calculateMD5Hash: (image: Uint8Array) =>
+          CryptoJS.MD5(
+            CryptoJS.lib.WordArray.create(image as unknown as number[])
+          ).toString()
       }
 
       await this.espLoader.writeFlash(flashOptions)
-    } catch (e) {
+      await this.espLoader.after()
+    } catch (e: any) {
       console.error(e)
-      this.serialTerminal.writeln(`Error: ${e.message}`)
+      this.espLoaderTerminal.writeLine(`Error: ${e.message}`)
       return false
     }
 

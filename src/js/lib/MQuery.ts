@@ -114,13 +114,16 @@ const intialiseMQueryEventHandlers = (eventType: string) => {
 }
 
 const mQueryEventHandler = (event: MouseEvent) => {
+  const target = event.target
+
+  if (!(target instanceof Element)) return
+
   MQueryEventHandlers.forEach((handler: MQueryEventHandler) => {
     if (handler.eventType !== event.type) {
       return
     }
 
-    // @ts-ignore
-    if (event.target.matches(handler.selector)) {
+    if (target.matches(handler.selector)) {
       handler.eventListenerFn(event)
     }
 

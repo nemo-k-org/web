@@ -1,30 +1,34 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { IEspLoaderTerminal } from 'esptool-js'
 
-import MainUI from './MainUI'
-import JobSubmitter from './JobSubmitter'
-import UserAccount from './UserAccount'
-import JobsTableHandler from './JobsTableHandler'
+import { Firmwares } from './types'
 
-const mainUI = new MainUI()
+import DebugTerminal from './DebugTerminal'
+import ProgramUploader from './ProgramUploader'
 
-const espLoaderTerminal: IEspLoaderTerminal = {
-  clean () {
-    mainUI.firmwareUploader.serialTerminal.clear()
-    mainUI.firmwareUploadProgress(0)
+const firmwares: Firmwares = {
+  none: {
+    legend: 'No sensor',
+    url: null
   },
-  writeLine (data: string) {
-    mainUI.firmwareUploader.serialTerminal.writeln(data)
-    mainUI.firmwareUploadMessage(data)
+  test: {
+    legend: 'Test sensor',
+    url: '/firmware/firmware_test.bin'
   },
-  write (data: string) {
-    mainUI.firmwareUploader.serialTerminal.write(data)
-    mainUI.firmwareUploadMessage(data)
+  tempds18b20: {
+    legend: 'Temperature sensor DS18B20',
+    url: '/firmware/firmware_ds18b20.bin'
+  },
+  tempmax6675: {
+    legend: 'Temperature sensor MAX6675',
+    url: '/firmware/firmware_max6675.bin'
   }
 }
-mainUI.firmwareUploader.espLoaderTerminal = espLoaderTerminal
 
-const userAccount = new UserAccount()
-const jobSubmitter = new JobSubmitter(userAccount.getCustomerCode) // eslint-disable-line no-unused-vars
-const jobsTableHandler = new JobsTableHandler('#tableJobs', userAccount.getCustomerCode)
-jobsTableHandler.firmwareUploader = mainUI.firmwareUploader
+const debugTerminal = new DebugTerminal()
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const programUploader = new ProgramUploader(
+  (sensorType: string) => { console.debug(`New sensor type: ${sensorType}`) },
+  firmwares,
+  debugTerminal
+)
