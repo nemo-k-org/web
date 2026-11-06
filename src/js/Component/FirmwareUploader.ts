@@ -1,8 +1,12 @@
 import axios from 'axios'
+import { Buffer } from 'buffer'
 import CryptoJS from 'crypto-js'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
+import { createLittleFS, formatDiskVersion, DISK_VERSION_2_0, DISK_VERSION_2_1 } from 'littlefs-wasm'
 
 class FirmwareUploader {
+  static readonly ESP01_FLASHSIZE = "1MB"
+
   serialDevice: any
   serialTransport: Transport | null
   espLoader: ESPLoader
@@ -116,22 +120,74 @@ class FirmwareUploader {
     return true
   }
 
+  getTestLittleFSImage = async (): Promise<Uint8Array<ArrayBufferLike>> => {
+    console.debug('creating fs')
+    const fs = await createLittleFS({
+      blockSize: 4096,
+      blockCount: 64,
+      formatOnInit: true,
+      // diskVersion: DISK_VERSION_2_0,
+    })
+
+    console.debug(
+      'littlefs-wasm disk versions',
+      `DISK_VERSION_2_0: ${DISK_VERSION_2_0}`,
+      `DISK_VERSION_2_1: ${DISK_VERSION_2_1}`,
+      `current disk version: ${ fs.getDiskVersion() }`,
+    )
+
+    console.debug('making directories')
+    fs.mkdir('/nvs')
+    fs.mkdir('/nvs/testapp')
+
+    fs.writeFile('/test.txt', 'This is from mklittlefs-wasm!')
+
+    const intBuffer = Buffer.alloc(4);
+    intBuffer.writeInt32LE(42, 0);
+    fs.writeFile('/nvs/testapp/testint', intBuffer)
+
+    console.debug('writing teststr')
+    fs.writeFile('/nvs/testapp/teststr', 'Hello wasm!')
+
+    console.log('littlefs-wasm files', fs.list("/"))
+    console.log('littlefs-wasm disk version:', formatDiskVersion(fs.getDiskVersion()))
+
+    const image = fs.toImage()
+    fs.destroy()
+
+    return image
+  }
+
   uploadFirmwareToMicrocontroller = async (): Promise<boolean> => {
+    this.espLoaderTerminal.write('Creating littlefs image...')
+    const littleFSImage = await this.getTestLittleFSImage()
+    // await this.getTestLittleFSImage()
+    this.espLoaderTerminal.writeLine('done')
+
+    const hex = (bytes: Uint8Array) =>
+      Array.from(bytes, b => b.toString(16).padStart(2, "0")).join(" ")
+
+    console.log("littlefs-wasm 32 bytes", hex(littleFSImage.subarray(0, 32)))
+
     const flashOptionsFileArray = [
       {
         data: new Uint8Array(this.firmwareImage),
         address: 0x0
+      },
+      {
+        data: littleFSImage,
+        address: 0xBB000
       }
     ]
 
     try {
       const flashOptions: FlashOptions = {
         fileArray: flashOptionsFileArray,
-        flashSize: 'keep',
         eraseAll: false,
         compress: true,
         flashMode: 'keep',
         flashFreq: 'keep',
+        flashSize: FirmwareUploader.ESP01_FLASHSIZE,
         calculateMD5Hash: (image: Uint8Array) =>
           CryptoJS.MD5(
             CryptoJS.lib.WordArray.create(image as unknown as number[])
