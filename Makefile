@@ -4,6 +4,9 @@ build/index.html: src/html/index.html
 build/local.css: src/html/index.css
 	cp src/html/index.css build/local.css
 
+build/littlefs.wasm: node_modules/littlefs/dist/littlefs.wasm
+	cp node_modules/littlefs/dist/littlefs.wasm build/littlefs.wasm
+
 .PHONY: clean-build-targets
 clean-build-targets:
 	-rm build/index.*
@@ -27,10 +30,10 @@ lint-js:
 	npx eslint "src/js/**"
 
 .PHONY: build-dev
-build-dev: lint-js build-js-dev build/index.html build/local.css build/xterm.css build/xterm.js
+build-dev: lint-js build-js-dev build/littlefs.wasm build/index.html build/local.css build/xterm.css build/xterm.js
 
 .PHONY: build-prod
-build-prod: lint-js build-js-prod build/index.html build/local.css build/xterm.css build/xterm.js
+build-prod: lint-js build-js-prod build/littlefs.wasm build/index.html build/local.css build/xterm.css build/xterm.js
 
 .PHONY: start
 start:

@@ -12,7 +12,7 @@
     "eslint": "^10.14.0",
     "esptool-js": "^0.7.1",
     "globals": "^17.14.0",
-    "littlefs-wasm": "file:../littlefs-wasm",
+    "littlefs": "file:../littlefs-wasm-wokwi",
     "mini-css-extract-plugin": "^2.8.1",
     "playwright": "^1.42.1",
     "timesago": "^1.0.1",

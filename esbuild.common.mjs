@@ -2,7 +2,6 @@ export const commonParameters = {
     entryPoints: ['src/js/index.ts'],
     platform: 'browser',
     bundle: true,
-    format: 'esm',
     loader: {
       '.png': 'dataurl',
       '.jpg': 'file',

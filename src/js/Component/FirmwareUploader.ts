@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Buffer } from 'buffer'
 import CryptoJS from 'crypto-js'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
-import { createLittleFS, formatDiskVersion, DISK_VERSION_2_0, DISK_VERSION_2_1 } from 'littlefs-wasm'
+import createLittleFS from 'littlefs'
 
 class FirmwareUploader {
   static readonly ESP01_FLASHSIZE = "1MB"
@@ -120,40 +120,136 @@ class FirmwareUploader {
     return true
   }
 
-  getTestLittleFSImage = async (): Promise<Uint8Array<ArrayBufferLike>> => {
+  getTestLittleFSImage = async (): Promise<Uint8Array> => {
     console.debug('creating fs')
-    const fs = await createLittleFS({
-      blockSize: 4096,
-      blockCount: 64,
-      formatOnInit: true,
-      // diskVersion: DISK_VERSION_2_0,
-    })
 
-    console.debug(
-      'littlefs-wasm disk versions',
-      `DISK_VERSION_2_0: ${DISK_VERSION_2_0}`,
-      `DISK_VERSION_2_1: ${DISK_VERSION_2_1}`,
-      `current disk version: ${ fs.getDiskVersion() }`,
+    const BLOCK_SIZE = 4096;
+    const PROG_SIZE = 256;
+    const BLOCK_COUNT = 64;
+
+    // const littlefs = await createLittleFS({locateFile: () => '/littlefs.wasm'})
+    const littlefs = await createLittleFS({locateFile: () => '/littlefs.wasm'})
+
+    console.debug('littlefs has _lfs_make_dir', typeof littlefs._lfs_make_dir)
+    const flash = new Uint8Array(BLOCK_SIZE * BLOCK_COUNT);
+
+    const flashRead = (
+      _cfg: number,
+      block: number,
+      offset: number,
+      buffer: number,
+      size: number,
+    ): number => {
+      const start = block * BLOCK_SIZE + offset;
+      littlefs.HEAPU8.set(flash.subarray(start, start + size), buffer);
+      return 0;
+    };
+
+    const flashProg = (
+      _cfg: number,
+      block: number,
+      offset: number,
+      buffer: number,
+      size: number,
+    ): number => {
+      const start = block * BLOCK_SIZE + offset;
+      flash.set(littlefs.HEAPU8.subarray(buffer, buffer + size), start);
+      return 0;
+    };
+
+    const flashErase = (_cfg: number, block: number): number => {
+      const start = block * BLOCK_SIZE;
+      flash.fill(0xff, start, start + BLOCK_SIZE);
+      return 0;
+    };
+
+    const flashSync = (_cfg: number): number => {
+      console.debug('flashSync cfg', _cfg)
+      return 0
+    };
+
+    const readFn = littlefs.addFunction(flashRead, "iiiiii")
+    const progFn = littlefs.addFunction(flashProg, "iiiiii")
+    const eraseFn = littlefs.addFunction(flashErase, "iii")
+    const syncFn = littlefs.addFunction(flashSync, "ii")
+
+    const config = littlefs._new_lfs_config(
+      readFn,
+      progFn,
+      eraseFn,
+      syncFn,
+      BLOCK_COUNT,
+      BLOCK_SIZE,
+      PROG_SIZE,
     )
 
-    console.debug('making directories')
-    fs.mkdir('/nvs')
-    fs.mkdir('/nvs/testapp')
+    this.espLoaderTerminal.write('Creating littlefs... ')
+    const lfs = littlefs._new_lfs()
 
-    fs.writeFile('/test.txt', 'This is from mklittlefs-wasm!')
+    this.espLoaderTerminal.write('formatting... ')
+    littlefs._lfs_format(lfs, config)
 
-    const intBuffer = Buffer.alloc(4);
-    intBuffer.writeInt32LE(42, 0);
-    fs.writeFile('/nvs/testapp/testint', intBuffer)
+    this.espLoaderTerminal.write('mounting... ')
+    littlefs._lfs_mount(lfs, config)
 
-    console.debug('writing teststr')
-    fs.writeFile('/nvs/testapp/teststr', 'Hello wasm!')
+    this.espLoaderTerminal.write('creating directories... ')
+    const mkdir = littlefs.cwrap(
+      'lfs_make_dir',
+      'number',
+      ['number', 'string']
+    )
 
-    console.log('littlefs-wasm files', fs.list("/"))
-    console.log('littlefs-wasm disk version:', formatDiskVersion(fs.getDiskVersion()))
+    const result_mkdirNvs: number = mkdir(lfs, 'nvs')
+    if (result_mkdirNvs < 0) {
+      throw new Error(`mkdir returns error code: ${result_mkdirNvs}`)
+    }
 
-    const image = fs.toImage()
-    fs.destroy()
+    const result_mkdirTestapp: number = mkdir(lfs, 'nvs/testapp')
+    if (result_mkdirTestapp < 0) {
+      throw new Error(`mkdir returns error code: ${result_mkdirTestapp}`)
+    }
+
+    this.espLoaderTerminal.write('writing files... ')
+    const fileWrite = littlefs.cwrap(
+      'lfs_write_file',
+      ['number'],
+      ['number', 'string', 'string', 'number']
+    )
+
+    const fileData = 'Hello from new littlefs!\n'
+    fileWrite(lfs, 'test.txt', fileData, fileData.length)
+
+    const fileData2 = 'test string'
+    fileWrite(lfs, 'nvs/testapp/teststr', fileData2, fileData2.length)
+
+    const fileData3 = Buffer.alloc(4)
+    fileData3.writeInt32LE(42, 0)
+    fileWrite(lfs, 'nvs/testapp/testint', fileData3.toString(), fileData3.length)
+
+    this.espLoaderTerminal.write('unmounting... ')
+    littlefs._lfs_unmount(lfs)
+
+    this.espLoaderTerminal.writeLine('done')
+
+    return flash
+  }
+
+  getTestLittleFSImageHTTP = async (): Promise<Uint8Array> => {
+    const response = await fetch("http://localhost:8000/littlefs.bin", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} fetching littlefs.bin`);
+    }
+
+    const image = new Uint8Array(await response.arrayBuffer());
+
+    if (image.byteLength !== 262144) {
+      throw new Error(`Expected 262144 bytes, got ${image.byteLength}`);
+    }
+
+    console.log(`Fetched ${image.byteLength} bytes`);
 
     return image
   }
@@ -161,6 +257,7 @@ class FirmwareUploader {
   uploadFirmwareToMicrocontroller = async (): Promise<boolean> => {
     this.espLoaderTerminal.write('Creating littlefs image...')
     const littleFSImage = await this.getTestLittleFSImage()
+    // const littleFSImage = await this.getTestLittleFSImageHTTP()
     // await this.getTestLittleFSImage()
     this.espLoaderTerminal.writeLine('done')
 
@@ -168,6 +265,7 @@ class FirmwareUploader {
       Array.from(bytes, b => b.toString(16).padStart(2, "0")).join(" ")
 
     console.log("littlefs-wasm 32 bytes", hex(littleFSImage.subarray(0, 32)))
+    console.log("littlefs-wasm image size", littleFSImage.length)
 
     const flashOptionsFileArray = [
       {
