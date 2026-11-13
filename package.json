@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@nemo-k-org/littlefs-wasm-preferences": "file:../littlefs-wasm-preferences/nemo-k-org-littlefs-wasm-preferences-0.0.1.tgz",
     "@types/bootstrap": "^5.2.10",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^20.11.26",
@@ -12,7 +13,6 @@
     "eslint": "^10.14.0",
     "esptool-js": "^0.7.1",
     "globals": "^17.14.0",
-    "littlefs": "file:../littlefs-wasm-wokwi",
     "mini-css-extract-plugin": "^2.8.1",
     "playwright": "^1.42.1",
     "timesago": "^1.0.1",

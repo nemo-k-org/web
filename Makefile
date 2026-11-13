@@ -4,8 +4,8 @@ build/index.html: src/html/index.html
 build/local.css: src/html/index.css
 	cp src/html/index.css build/local.css
 
-build/littlefs.wasm: node_modules/littlefs/dist/littlefs.wasm
-	cp node_modules/littlefs/dist/littlefs.wasm build/littlefs.wasm
+build/littlefs.wasm: node_modules/@nemo-k-org/littlefs-wasm-preferences/dist/littlefs.wasm
+	cp node_modules/@nemo-k-org/littlefs-wasm-preferences/dist/littlefs.wasm build/littlefs.wasm
 
 .PHONY: clean-build-targets
 clean-build-targets:

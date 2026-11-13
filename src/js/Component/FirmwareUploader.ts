@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { Buffer } from 'buffer'
 import CryptoJS from 'crypto-js'
+import LittleFSWASMPreferences from '@nemo-k-org/littlefs-wasm-preferences'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
-import createLittleFS from 'littlefs'
 
 class FirmwareUploader {
   static readonly ESP01_FLASHSIZE = "1MB"
@@ -121,117 +120,13 @@ class FirmwareUploader {
   }
 
   getTestLittleFSImage = async (): Promise<Uint8Array> => {
-    console.debug('creating fs')
+    const preferencesFS = new LittleFSWASMPreferences('testapp', (message: string) => { console.debug(message) })
+    preferencesFS.putString('teststr', 'test string preferencesFS')
+    preferencesFS.putInt('testint', 67)
 
-    const BLOCK_SIZE = 4096;
-    const PROG_SIZE = 256;
-    const BLOCK_COUNT = 64;
+    const image = await preferencesFS.getLittleFSImage()
 
-    // const littlefs = await createLittleFS({locateFile: () => '/littlefs.wasm'})
-    const littlefs = await createLittleFS({locateFile: () => '/littlefs.wasm'})
-
-    console.debug('littlefs has _lfs_make_dir', typeof littlefs._lfs_make_dir)
-    const flash = new Uint8Array(BLOCK_SIZE * BLOCK_COUNT);
-
-    const flashRead = (
-      _cfg: number,
-      block: number,
-      offset: number,
-      buffer: number,
-      size: number,
-    ): number => {
-      const start = block * BLOCK_SIZE + offset;
-      littlefs.HEAPU8.set(flash.subarray(start, start + size), buffer);
-      return 0;
-    };
-
-    const flashProg = (
-      _cfg: number,
-      block: number,
-      offset: number,
-      buffer: number,
-      size: number,
-    ): number => {
-      const start = block * BLOCK_SIZE + offset;
-      flash.set(littlefs.HEAPU8.subarray(buffer, buffer + size), start);
-      return 0;
-    };
-
-    const flashErase = (_cfg: number, block: number): number => {
-      const start = block * BLOCK_SIZE;
-      flash.fill(0xff, start, start + BLOCK_SIZE);
-      return 0;
-    };
-
-    const flashSync = (_cfg: number): number => {
-      console.debug('flashSync cfg', _cfg)
-      return 0
-    };
-
-    const readFn = littlefs.addFunction(flashRead, "iiiiii")
-    const progFn = littlefs.addFunction(flashProg, "iiiiii")
-    const eraseFn = littlefs.addFunction(flashErase, "iii")
-    const syncFn = littlefs.addFunction(flashSync, "ii")
-
-    const config = littlefs._new_lfs_config(
-      readFn,
-      progFn,
-      eraseFn,
-      syncFn,
-      BLOCK_COUNT,
-      BLOCK_SIZE,
-      PROG_SIZE,
-    )
-
-    this.espLoaderTerminal.write('Creating littlefs... ')
-    const lfs = littlefs._new_lfs()
-
-    this.espLoaderTerminal.write('formatting... ')
-    littlefs._lfs_format(lfs, config)
-
-    this.espLoaderTerminal.write('mounting... ')
-    littlefs._lfs_mount(lfs, config)
-
-    this.espLoaderTerminal.write('creating directories... ')
-    const mkdir = littlefs.cwrap(
-      'lfs_make_dir',
-      'number',
-      ['number', 'string']
-    )
-
-    const result_mkdirNvs: number = mkdir(lfs, 'nvs')
-    if (result_mkdirNvs < 0) {
-      throw new Error(`mkdir returns error code: ${result_mkdirNvs}`)
-    }
-
-    const result_mkdirTestapp: number = mkdir(lfs, 'nvs/testapp')
-    if (result_mkdirTestapp < 0) {
-      throw new Error(`mkdir returns error code: ${result_mkdirTestapp}`)
-    }
-
-    this.espLoaderTerminal.write('writing files... ')
-    const fileWrite = littlefs.cwrap(
-      'lfs_write_file',
-      ['number'],
-      ['number', 'string', 'string', 'number']
-    )
-
-    const fileData = 'Hello from new littlefs!\n'
-    fileWrite(lfs, 'test.txt', fileData, fileData.length)
-
-    const fileData2 = 'test string'
-    fileWrite(lfs, 'nvs/testapp/teststr', fileData2, fileData2.length)
-
-    const fileData3 = Buffer.alloc(4)
-    fileData3.writeInt32LE(42, 0)
-    fileWrite(lfs, 'nvs/testapp/testint', fileData3.toString(), fileData3.length)
-
-    this.espLoaderTerminal.write('unmounting... ')
-    littlefs._lfs_unmount(lfs)
-
-    this.espLoaderTerminal.writeLine('done')
-
-    return flash
+    return image
   }
 
   getTestLittleFSImageHTTP = async (): Promise<Uint8Array> => {
