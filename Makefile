@@ -22,15 +22,18 @@ build/xterm.css: node_modules/xterm/css/xterm.css
 build/xterm.js: node_modules/xterm/lib/xterm.js
 	cp node_modules/xterm/lib/xterm.js build/
 
+build/littlefs.wasm: node_modules/@nemo-k-org/littlefs-wasm-preferences/dist/littlefs.wasm
+	cp node_modules/@nemo-k-org/littlefs-wasm-preferences/dist/littlefs.wasm build/
+
 .PHONY: lint-js
 lint-js:
 	npx eslint "src/js/**"
 
 .PHONY: build-dev
-build-dev: lint-js build-js-dev build/index.html build/local.css build/xterm.css build/xterm.js
+build-dev: lint-js build-js-dev build/index.html build/local.css build/xterm.css build/xterm.js build/littlefs.wasm
 
 .PHONY: build-prod
-build-prod: lint-js build-js-prod build/index.html build/local.css build/xterm.css build/xterm.js
+build-prod: lint-js build-js-prod build/index.html build/local.css build/xterm.css build/xterm.js build/littlefs.wasm
 
 .PHONY: start
 start:
