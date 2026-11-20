@@ -1,6 +1,7 @@
 import * as m from './lib/MQuery'
 
 import { Firmwares } from './types'
+import { SensorParameters, SensorParameter } from './SensorParameters'
 import FirmwareUploader from './Component/FirmwareUploader'
 import DebugTerminal from './DebugTerminal'
 
@@ -8,11 +9,14 @@ class ProgramUploader {
   onSensorTypeChange: Function
   firmwares: Firmwares
   debugTerminal: DebugTerminal
+  sensorParameters: SensorParameters
 
   constructor (onSensorTypeChange: Function, firmwares: Firmwares, debugTerminal: DebugTerminal) {
     this.onSensorTypeChange = onSensorTypeChange
     this.firmwares = firmwares
     this.debugTerminal = debugTerminal
+
+    this.sensorParameters = new SensorParameters()
 
     window.addEventListener('load', () => {
       this.activateButtons()
@@ -28,7 +32,7 @@ class ProgramUploader {
       }
     })
 
-    m.OnClick('#buttonUploadProgram', this.uploadProgram)
+    m.OnClick('#buttonUploadProgram', this.uploadProgramAndSensorParameters)
   }
 
   getCurrentSensorType = (): string | null => {
@@ -49,16 +53,22 @@ class ProgramUploader {
     return null
   }
 
-  uploadProgram = async () => {
+  getCurrentSensorParameters = (): SensorParameter[] => {
+    return this.sensorParameters.getParameters()
+  }
+
+  uploadProgramAndSensorParameters = async () => {
     const firmwareURL: string | null = this.getCurrentSensorFirmwareURL()
 
     if (firmwareURL === null) {
       return
     }
 
+    const sensorParameters: SensorParameter[] = this.getCurrentSensorParameters()
+
     const firmwareUploader = new FirmwareUploader(this.debugTerminal.espLoaderTerminal)
 
-    const firmwareUploaded = await firmwareUploader.uploadFirmware(firmwareURL)
+    const firmwareUploaded = await firmwareUploader.uploadFirmware(firmwareURL, sensorParameters)
 
     if (firmwareUploaded) {
       this.debugTerminal.espLoaderTerminal.writeLine('Program uploaded successfully. You may now disconnect your microcontroller from your computer.')

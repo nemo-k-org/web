@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@nemo-k-org/littlefs-wasm-preferences": "https://github.com/nemo-k-org/littlefs-wasm-preferences/releases/download/v0.0.6/nemo-k-org-littlefs-wasm-preferences-0.0.6.tgz",
     "@types/bootstrap": "^5.2.10",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^20.11.26",

@@ -1,6 +1,9 @@
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 import { ESPLoader, LoaderOptions, FlashOptions, Transport, IEspLoaderTerminal } from 'esptool-js'
+import LittleFSWASMPreferences from '@nemo-k-org/littlefs-wasm-preferences'
+
+import { SensorParameter } from '../SensorParameters'
 
 class FirmwareUploader {
   serialDevice: any
@@ -9,6 +12,7 @@ class FirmwareUploader {
   espLoaderTerminal: IEspLoaderTerminal
   connectedChip: string
   firmwareImage: ArrayBuffer
+  preferencesImage: Uint8Array
 
   constructor(espLoaderTerminal: IEspLoaderTerminal) {
     this.serialDevice = null
@@ -16,9 +20,15 @@ class FirmwareUploader {
     this.connectedChip = ''
     this.espLoaderTerminal = espLoaderTerminal
     this.firmwareImage = new ArrayBuffer()
+    this.preferencesImage = new ArrayBuffer()
   }
 
-  uploadFirmware = async (firmwareURL: string): Promise<boolean> => {
+  uploadFirmware = async (firmwareURL: string, sensorParameters: SensorParameter[]): Promise<boolean> => {
+    if (!await this.createPreferencesImage(sensorParameters)) {
+      this.espLoaderTerminal.writeLine('Creating preferences image failed')
+      return false
+    }
+
     if (!await this.serialConnect()) {
       this.espLoaderTerminal.writeLine('Firmware upload failed: could not open serial connection')
       await this.serialDisconnect()
@@ -121,6 +131,10 @@ class FirmwareUploader {
       {
         data: new Uint8Array(this.firmwareImage),
         address: 0x0
+      },
+      {
+        data: this.preferencesImage,
+        address: 0xBB000
       }
     ]
 
@@ -145,6 +159,34 @@ class FirmwareUploader {
       this.espLoaderTerminal.writeLine(`Error: ${e.message}`)
       return false
     }
+
+    return true
+  }
+
+  createPreferencesImage = async (sensorParameters: SensorParameter[]): Promise<boolean> => {
+    const preferencesFS = new LittleFSWASMPreferences(
+      'nemok',
+      (message: string) => { this.espLoaderTerminal.writeLine(message) }
+    )
+
+    for (const sensorParameter of sensorParameters) {
+      console.debug('createPreferencesImage', sensorParameter)
+      if (sensorParameter.value !== null) {
+        try {
+          preferencesFS.put(
+            sensorParameter.key,
+            sensorParameter.value,
+            sensorParameter.type
+          )
+
+        } catch (error: any) {
+          this.espLoaderTerminal.writeLine(`Error while adding values to preferences image: ${error.message}`)
+          return false
+        }
+      }
+    }
+
+    this.preferencesImage = await preferencesFS.getLittleFSImage()
 
     return true
   }
