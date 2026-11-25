@@ -1,18 +1,16 @@
 import * as m from './lib/MQuery'
 
-import { Firmwares } from './types'
+import { SensorType, Firmwares } from './types'
 import { SensorParameters, SensorParameter } from './SensorParameters'
 import FirmwareUploader from './Component/FirmwareUploader'
 import DebugTerminal from './DebugTerminal'
 
 class ProgramUploader {
-  onSensorTypeChange: Function
   firmwares: Firmwares
   debugTerminal: DebugTerminal
   sensorParameters: SensorParameters
 
-  constructor (onSensorTypeChange: Function, firmwares: Firmwares, debugTerminal: DebugTerminal) {
-    this.onSensorTypeChange = onSensorTypeChange
+  constructor (firmwares: Firmwares, debugTerminal: DebugTerminal) {
     this.firmwares = firmwares
     this.debugTerminal = debugTerminal
 
@@ -25,7 +23,7 @@ class ProgramUploader {
 
   activateButtons = () => {
     m.OnEvent('.radioSensorType', 'change', () => {
-      const newSensorType: string | null = this.getCurrentSensorType()
+      const newSensorType: SensorType | null = this.getCurrentSensorType()
 
       if (newSensorType !== null) {
         this.onSensorTypeChange(newSensorType)
@@ -35,12 +33,12 @@ class ProgramUploader {
     m.OnClick('#buttonUploadProgram', this.uploadProgramAndSensorParameters)
   }
 
-  getCurrentSensorType = (): string | null => {
-    return m.GetFormRadioValue('sensorType')
+  getCurrentSensorType = (): SensorType | null => {
+    return m.GetFormRadioValue('sensorType') as SensorType
   }
 
   getCurrentSensorFirmwareURL = (): string | null => {
-    const sensorType: string | null = this.getCurrentSensorType()
+    const sensorType: SensorType | null = this.getCurrentSensorType()
 
     if (sensorType === null) {
       return null
@@ -55,6 +53,14 @@ class ProgramUploader {
 
   getCurrentSensorParameters = (): SensorParameter[] => {
     return this.sensorParameters.getParameters()
+  }
+
+  onSensorTypeChange = (sensorType: SensorType) => {
+    if (sensorType in this.firmwares) {
+      m.Hide('.sensorParameter')
+      m.Show('.sensorParameterCommon')
+      m.Show(this.firmwares[sensorType].uiParameterSelector)
+    }
   }
 
   uploadProgramAndSensorParameters = async () => {
