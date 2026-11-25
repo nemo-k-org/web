@@ -26,15 +26,9 @@
 
         <form>
             <p>Select sensor type:</p>
-            <div class="form-check">
-                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeNone" value="none" checked>
-                <label class="form-check-label" for="sensorTypeNone">
-                    Default radio
-                </label>
-            </div>
 
             <div class="form-check">
-                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeTest" value="test">
+                <input class="form-check-input radioSensorType" type="radio" name="sensorType" id="sensorTypeTest" value="test" checked>
                 <label class="form-check-label" for="sensorTypeTest">
                     Test sensor
                 </label>
@@ -75,7 +69,7 @@
             <div id="sensorParameterArea">
                 <p class="sensorParameter sensorParameterNone">Please select sensor type.</p>
 
-                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterCommon">
                     <label for="sensorParameterSsid">Your WiFi SSID</label>
                     <input type="text" class="form-control" id="sensorParameterSsid" aria-describedby="sensorParameterSsidHelp">
                     <small id="sensorParameterSsidHelp" class="form-text text-muted">
@@ -84,7 +78,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter sensorParameterTest sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterCommon">
                     <label for="sensorParameterPass">Your WiFi password</label>
                     <input type="text" class="form-control" id="sensorParameterPass" aria-describedby="sensorParameterPassHelp">
                     <small id="sensorParameterPassHelp" class="form-text text-muted">
@@ -93,7 +87,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675 sensorParameterGNSSneo6mv2 sensorParameterADCTanklevel">
                     <label for="sensorParameterHostname">Sensor Name</label>
                     <input type="text" class="form-control" id="sensorParameterHostname" aria-describedby="sensorParameterHostnameHelp">
                     <small id="sensorParameterHostnameHelp" class="form-text text-muted">
@@ -102,7 +96,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675 sensorParameterGNSSneo6mv2 sensorParameterADCTanklevel">
                     <label for="sensorParameterSensorDelay">Sensor Delay</label>
                     <input type="text" class="form-control" id="sensorParameterSensorDelay" aria-describedby="sensorParameterSensorDelayHelp">
                     <small id="sensorParameterSensorDelayHelp" class="form-text text-muted">
@@ -112,7 +106,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675 sensorParameterGNSSneo6mv2 sensorParameterADCTanklevel">
                     <label for="sensorParameterKey">SignalK Data Key</label>
                     <input type="text" class="form-control" id="sensorParameterKey" aria-describedby="sensorParameterKey">
                     <small id="sensorParameterKeyHelp" class="form-text text-muted">
@@ -121,7 +115,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675 sensorParameterGNSSneo6mv2 sensorParameterADCTanklevel">
                     <label for="sensorParameterServerHost">Server IP</label>
                     <input type="text" class="form-control" id="sensorParameterServerHost" aria-describedby="sensorParameterServerHostHelp">
                     <small id="sensorParameterServerHostHelp" class="form-text text-muted">
@@ -130,7 +124,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675">
+                <div class="form-group sensorParameter sensorParameterDS18B20 sensorParameterMAX6675 sensorParameterGNSSneo6mv2 sensorParameterADCTanklevel">
                     <label for="sensorParameterServerPort">Server Port Number</label>
                     <input type="text" class="form-control" id="sensorParameterServerPort" aria-describedby="sensorParameterPortHelp">
                     <small id="sensorParameterPortHelp" class="form-text text-muted">
@@ -139,7 +133,9 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter">
+                <!-- ADC TankLevel -->
+
+                <div class="form-group sensorParameter sensorParameterADCTanklevel">
                     <label for="sensorParameterADCTanklevel0">Tank Level 0 %</label>
                     <input type="text" class="form-control" id="sensorParameterADCTanklevel0" aria-describedby="sensorParameterADCTanklevel0Help">
                     <small id="sensorParameterADCTanklevel0Help" class="form-text text-muted">
@@ -148,7 +144,7 @@
                     </small>
                 </div>
 
-                <div class="form-group sensorParameter">
+                <div class="form-group sensorParameter sensorParameterADCTanklevel">
                     <label for="sensorParameterADCTanklevel100">Tank Level 100 %</label>
                     <input type="text" class="form-control" id="sensorParameterADCTanklevel100" aria-describedby="sensorParameterADCTanklevel100Help">
                     <small id="sensorParameterADCTanklevel100Help" class="form-text text-muted">

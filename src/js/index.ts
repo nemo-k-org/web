@@ -9,7 +9,6 @@ import { FIRMWARES } from './constants'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const programUploader = new ProgramUploader(
-  (sensorType: string) => { console.debug(`New sensor type: ${sensorType}`) },
   FIRMWARES,
   debugTerminal
 )

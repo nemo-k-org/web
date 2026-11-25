@@ -1,33 +1,35 @@
 import { Firmwares } from './types'
 
 export const FIRMWARES: Firmwares = {
-  none: {
-    legend: 'No sensor',
-    url: null
-  },
   test: {
     legend: 'Test sensor',
-    url: '/firmware/firmware_test_http.bin'
+    url: '/firmware/firmware_test_http.bin',
+    uiParameterSelector: '.sensorParametertest'
   },
   tempds18b20: {
     legend: 'Temperature sensor DS18B20',
-    url: '/firmware/firmware_temp_ds18b20.bin'
+    url: '/firmware/firmware_temp_ds18b20.bin',
+    uiParameterSelector: '.sensorParameterDS18B20'
   },
   tempmax6675: {
     legend: 'Temperature sensor MAX6675',
-    url: '/firmware/firmware_temp_max6675.bin'
+    url: '/firmware/firmware_temp_max6675.bin',
+    uiParameterSelector: '.sensorParameterMAX6675'
   },
   gnssneo6mv2: {
     legend: 'GNSS sensor NEO6MV2 (SignalK)',
-    url: '/firmware/firmware_gnss_neo6mv2.bin'
+    url: '/firmware/firmware_gnss_neo6mv2.bin',
+    uiParameterSelector: '.sensorParameterGNSSneo6mv2'
   },
   gnssneo6mv2_udp: {
     legend: 'GNSS sensor NEO6MV2 (UDP)',
-    url: '/firmware/firmware_gnss_neo6mv2_udp.bin'
+    url: '/firmware/firmware_gnss_neo6mv2_udp.bin',
+    uiParameterSelector: '.sensorParameterGNSSneo6mv2'
   },
   adctanklevel: {
     legend: 'ADC Tanklevel sensor',
-    url: '/firmware/firmware_adc_tanklevel.bin'
+    url: '/firmware/firmware_adc_tanklevel.bin',
+    uiParameterSelector: '.sensorParameterADCTanklevel'
   }
 }
 
